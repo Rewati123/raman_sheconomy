@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Home, Users, Calendar, Folder, Settings } from "lucide-react";
 import { FaVideo } from "react-icons/fa";
-import { Card } from "@/components/ui/card"; // ShadCN Card Component
+import { Card } from "@/Components/ui/card"; // ShadCN Card Component
 
 const Sidebar = () => {
   return (
