@@ -6,7 +6,7 @@ import { Input } from "@/Components/ui/input";
 import ProgramAdd from "@/Program/ProgramAdd";
 import ProgramEdit from "@/Program/ProgramEdit";
 import { Eye, Trash2, Edit } from "lucide-react";
-import { MoreHorizontal } from "lucide-react"; // Add import for the three-dot icon
+import { MoreHorizontal } from "lucide-react"; 
 
 import axios from "axios";
 
@@ -18,12 +18,12 @@ const ProgramList = () => {
   const [editData, setEditData] = useState(null);
   const [seoData, setSeoData] = useState(null);
   const [showSeoDetails, setShowSeoDetails] = useState(null);
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const [showModal, setShowModal] = useState(false); 
   const [selectedSeoData, setSelectedSeoData] = useState(null)
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dataPerPage = 5;
 
-  // Fetch data from API
+
   useEffect(() => {
     const fetchProgramData = async (programId) => {
       try {

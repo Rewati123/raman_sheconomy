@@ -178,7 +178,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
      
         const seoResponse = await axios.post("/api/keywords",form, {
           headers: {
-            "Content-Type": "multipart/form-data", // Important for file uploads
+            "Content-Type": "multipart/form-data", 
           },
       
         }); 
