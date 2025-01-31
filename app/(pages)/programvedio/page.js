@@ -1,5 +1,5 @@
 import React from 'react'
-import VedioList from "../../../Components/Vedio/VedioList"
+import VedioList from "@/Components/Vedio/VedioList"
 const page = () => {
   return (
     <div>

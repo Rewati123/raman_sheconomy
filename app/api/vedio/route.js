@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import { queryPromise } from '../../../lib/db';
+import { queryPromise } from '@/lib/db';
 
 export const config = {
   api: {

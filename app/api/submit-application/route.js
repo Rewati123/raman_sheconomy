@@ -1,6 +1,6 @@
 // pages/api/applications/index.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { queryPromise } from '../../../lib/db';
+import { queryPromise } from '@/lib/db';
 
 
   export async function GET() {

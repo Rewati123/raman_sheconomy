@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { queryPromise } from '../../../lib/db';
+import { queryPromise } from '@/lib/db';
 import { writeFile, mkdir } from 'fs/promises';
 import { join, extname } from 'path';
 

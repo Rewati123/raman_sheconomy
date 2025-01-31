@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import {queryPromise } from '../../../../lib/db'; // Correct default import
+import {queryPromise } from '@/lib/db'; // Correct default import
 
 export async function PUT(request) {
   try {
