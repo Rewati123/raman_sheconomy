@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import  Sidebaar  from "../Components/Sidebar"; 
+import  Sidebar  from "../Components/Sidebar"; 
 import  Header  from "../Components/Header";
 import "./globals.css";
 
@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <div className="flex h-screen bg-gray-100">
-          <Sidebaar />
+          <Sidebar />
           <div className="flex flex-col flex-1 overflow-hidden">
             <Header />
             <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
