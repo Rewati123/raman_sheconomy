@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Home, Users, Calendar, Folder, Settings } from "lucide-react";
 import { FaVideo } from "react-icons/fa";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/Components/ui/card";
 import { cn } from "@/lib/utils"; // अगर utils में `cn` function है तो इसे यूज़ करो
 
 const Sidebar = () => {
