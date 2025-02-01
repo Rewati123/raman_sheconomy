@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
-import ProgramAdd from "@/Program/ProgramAdd";
-import ProgramEdit from "@/Program/ProgramEdit";
+import ProgramAdd from "../../Components/Program/ProgramAdd";
+import ProgramEdit from "../../Components/Program/ProgramEdit";
 import { Eye, Trash2, Edit } from "lucide-react";
 import { MoreHorizontal } from "lucide-react"; 
 
