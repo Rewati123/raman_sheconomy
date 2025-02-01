@@ -188,83 +188,72 @@ return dataAdd ? (
     </div>
 
     <div className="mt-5 overflow-x-auto">
-  {/* Set a fixed height and allow vertical scrolling */}
-  <div className="max-h-96 overflow-y-auto">
-    <table className="min-w-full divide-y divide-gray-300">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SN</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">title</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">subtitle</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">short_description</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">description</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">image</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">ideal_for_description</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">timeline_description</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">start_date</th>
-          <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">end_date</th>
-          <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions</th>
-          <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">SEO</th> {/* Added SEO column */}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-200 bg-white">
-        {paginatedData.map((row, index) => (
-         
-          <tr key={row.id}>
-            
-            <td className="px-3 py-4 text-sm text-gray-500">
-              {(currentPage - 1) * dataPerPage + index + 1}
-            </td>
-            <td className="px-3 py-4">{row.title}</td>
-            <td className="px-3 py-4">{row.subtitle}</td>
-            <td className="px-3 py-4">{row.shortDescription}</td>
-            <td className="px-3 py-4">{row.description}</td>
-            <td className="px-3 py-4">
-              {row.image && <img src={row.image} alt="Program Image" />}
-            </td>
-            <td className="px-3 py-4">{row.idealForDescription}</td>
-            <td className="px-3 py-4">{row.timelineDescription}</td>
-            <td className="px-3 py-4">{row.startDate}</td>
-            <td className="px-3 py-4">{row.endDate}</td>
-            <td className="px-3 py-4 text-center">
-  <button  className="text-blue-500 hover:text-blue-700">
-    <Eye className="h-5 w-5" /> 
-  </button>
-  <button onClick={() => handleEdit(row)} className="text-blue-500 hover:text-blue-700 ml-3">
-    <Edit className="h-5 w-5" /> 
-  </button>
-  <button
-  onClick={() => handleDelete(row.programId)} // Use the correct field name
-  className="ml-3 text-red-500 hover:text-red-700"
->
-  <Trash2 className="h-5 w-5" />
-</button>
-</td>
-<td className="px-3 py-4 text-center">
-                    <button
-                      onClick={() => handleSeoClick(row.id)}
-                      className="ml-3 text-gray-500 hover:text-gray-700"
-                    >
+        <div className="max-h-96 overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-300">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SN</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Title</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Subtitle</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Short Description</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Description</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Image</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Ideal For Description</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Timeline Description</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
+                <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions</th>
+                <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">SEO</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {paginatedData.map((row, index) => (
+                <tr key={row.id}>
+                  <td className="px-3 py-4 text-sm text-gray-500">{(currentPage - 1) * dataPerPage + index + 1}</td>
+                  <td className="px-3 py-4">{row.title}</td>
+                  <td className="px-3 py-4">{row.subtitle}</td>
+                  <td className="px-3 py-4">{row.shortDescription}</td>
+                  <td className="px-3 py-4">{row.description}</td>
+                  <td className="px-3 py-4">
+                    {row.image && <img src={row.image || "/placeholder.svg"} alt="Program Image" />}
+                  </td>
+                  <td className="px-3 py-4">{row.idealForDescription}</td>
+                  <td className="px-3 py-4">{row.timelineDescription}</td>
+                  <td className="px-3 py-4">{row.startDate}</td>
+                  <td className="px-3 py-4">{row.endDate}</td>
+                  <td className="px-3 py-4 text-center">
+                    <button className="text-blue-500 hover:text-blue-700">
+                      <Eye className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => handleEdit(row)} className="text-blue-500 hover:text-blue-700 ml-3">
+                      <Edit className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => handleDelete(row.id)} className="ml-3 text-red-500 hover:text-red-700">
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </td>
+                  <td className="px-3 py-4 text-center">
+                    <button onClick={() => handleSeoClick(row.id)} className="ml-3 text-gray-500 hover:text-gray-700">
                       <MoreHorizontal className="h-5 w-5" />
                     </button>
- </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  <div className="mt-4 flex justify-end items-center space-x-4">
-    <Button onClick={prevPage} disabled={currentPage === 1} className="bg-gray-500 text-white">
-      Previous
-    </Button>
-    <span className="text-sm text-gray-500">
-      Page {currentPage} of {totalPages}
-    </span>
-    <Button onClick={nextPage} disabled={currentPage === totalPages} className="bg-gray-500 text-white">
-      Next
-    </Button>
-  </div>
-</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 flex justify-end items-center space-x-4">
+          <Button onClick={prevPage} disabled={currentPage === 1} className="bg-gray-500 text-white">
+            Previous
+          </Button>
+          <span className="text-sm text-gray-500">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button onClick={nextPage} disabled={currentPage === totalPages} className="bg-gray-500 text-white">
+            Next
+          </Button>
+        </div>
+      </div>
 {showModal && selectedSeoData && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-gray-100 p-6 rounded-lg max-w-lg w-full">

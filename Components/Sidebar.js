@@ -2,6 +2,7 @@ import React from 'react';
 import Link from "next/link";
 import { Home, Users, Calendar, Folder, Settings } from "lucide-react";
 import { FaVideo } from 'react-icons/fa'
+
 const Sidebar = () => {
   return (
     <div className="flex flex-col w-64 bg-gray-800 text-white shadow-lg">
