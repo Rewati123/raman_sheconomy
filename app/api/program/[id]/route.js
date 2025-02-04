@@ -7,7 +7,7 @@ export async function PUT(request) {
     
     // Update Program Data
     const programUpdateQuery = `
-      UPDATE program SET
+      UPDATE Program SET
         title = ?, 
         subtitle = ?, 
         short_description = ?, 
@@ -27,7 +27,7 @@ export async function PUT(request) {
     if (benefits && benefits.length > 0) {
       const benefitUpdatePromises = benefits.map(benefit => {
         const benefitUpdateQuery = `
-          UPDATE benefit SET
+          UPDATE Benefit SET
             icon = ?, 
             title = ?, 
             description = ?
@@ -43,7 +43,7 @@ export async function PUT(request) {
     if (testimonials && testimonials.length > 0) {
       const testimonialUpdatePromises = testimonials.map(testimonial => {
         const testimonialUpdateQuery = `
-          UPDATE testimonial SET
+          UPDATE Testimonial SET
             name = ?, 
             profile = ?, 
             designation = ?, 
@@ -88,9 +88,9 @@ export async function GET(request) {
         t.profile AS testimonialProfile,
         t.designation AS testimonialDesignation,
         t.message AS testimonialMessage
-      FROM program p
-      LEFT JOIN benefit b ON p.id = b.programId
-      LEFT JOIN testimonial t ON p.id = t.programId
+      FROM Program p
+      LEFT JOIN Benefit b ON p.id = b.programId
+      LEFT JOIN Testimonial t ON p.id = t.programId
     `;
     
     const programs = await queryPromise(programQuery); 
@@ -159,15 +159,15 @@ export async function DELETE(request, { params }) {
 
   try {
    
-    const deleteTestimonialsQuery = `DELETE FROM testimonial WHERE programId = ?`;
+    const deleteTestimonialsQuery = `DELETE FROM Testimonial WHERE programId = ?`;
     await queryPromise(deleteTestimonialsQuery, [programId]);
 
     
-    const deleteBenefitsQuery = `DELETE FROM benefit WHERE programId = ?`;
+    const deleteBenefitsQuery = `DELETE FROM Benefit WHERE programId = ?`;
     await queryPromise(deleteBenefitsQuery, [programId]);
 
  
-    const deleteProgramQuery = `DELETE FROM program WHERE id = ?`;
+    const deleteProgramQuery = `DELETE FROM Program WHERE id = ?`;
     const deleteResult = await queryPromise(deleteProgramQuery, [programId]);
 
     if (deleteResult.affectedRows === 0) {

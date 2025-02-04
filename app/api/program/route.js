@@ -53,7 +53,7 @@ export async function POST(request) {
 
     // Insert program data into the program table
     const programInsertQuery = `
-      INSERT INTO program (title, subtitle, short_description, description, ideal_For_Description, timeline_Description, start_Date, end_Date, image)
+      INSERT INTO Program (title, subtitle, short_description, description, ideal_For_Description, timeline_Description, start_Date, end_Date, image)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const programResult = await queryPromise(programInsertQuery, [
@@ -97,7 +97,7 @@ export async function POST(request) {
         }
 
         const benefitInsertQuery = `
-          INSERT INTO benefit (programId, icon, title, description)
+          INSERT INTO Benefit (programId, icon, title, description)
           VALUES (?, ?, ?, ?)
         `;
         await queryPromise(benefitInsertQuery, [
@@ -132,7 +132,7 @@ export async function POST(request) {
       }
 
       const testimonialInsertQuery = `
-        INSERT INTO testimonial (programId, name, profile, designation, message)
+        INSERT INTO Testimonial (programId, name, profile, designation, message)
         VALUES (?, ?, ?, ?, ?)
       `;
       await queryPromise(testimonialInsertQuery, [
