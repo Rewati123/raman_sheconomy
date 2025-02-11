@@ -69,11 +69,18 @@ const ProgramList = () => {
   };
   // Delete Data
   const handleDelete = async (programId) => {
-    console.log('Deleting program with ID:', programId);  // Log the ID
+    if (!programId) {
+      console.error("Error: programId is undefined or null");
+      alert("Invalid program ID!");
+      return;
+    }
+  
+    console.log("Deleting program with ID:", programId);
+  
     try {
       const response = await axios.delete(`/api/program/${programId}`);
       if (response.status === 200) {
-        setUserData(userData.filter((item) => item.id !== programId)); // Remove deleted program from the list
+        setUserData(userData.filter((item) => item.id !== programId));
         alert("Program deleted successfully!");
       } else {
         alert("Failed to delete the program.");
@@ -83,6 +90,7 @@ const ProgramList = () => {
       alert("There was an error deleting the program.");
     }
   };
+  
   
   
 
@@ -228,9 +236,17 @@ return dataAdd ? (
                     <button onClick={() => handleEdit(row)} className="text-blue-500 hover:text-blue-700 ml-3">
                       <Edit className="h-5 w-5" />
                     </button>
-                    <button onClick={() => handleDelete(row.id)} className="ml-3 text-red-500 hover:text-red-700">
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+                    <button
+  onClick={() => {
+    
+    handleDelete(row?.programId);
+  }}
+  className="ml-3 text-red-500 hover:text-red-700"
+>
+  <Trash2 className="h-5 w-5" />
+</button>
+
+
                   </td>
                   <td className="px-3 py-4 text-center">
                     <button onClick={() => handleSeoClick(row.id)} className="ml-3 text-gray-500 hover:text-gray-700">
