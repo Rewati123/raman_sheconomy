@@ -25,6 +25,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
   const [seoData, setSeoData] = useState({
     metaTitle: "",
     metaDescription: "",
+    og_title:"",
     metaKeywords: [],
     ogImages: [],
   })
@@ -133,7 +134,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
     form.append("endDate", formData.endDate);
   
   
-    if (formData.testimonial.name || formData.testimonial.message) {
+    if (formData.testimonial.name || formData.testimonial.message||formData.testimonial.profile ) {
       form.append("testimonial", JSON.stringify(formData.testimonial));
     }
   

@@ -216,14 +216,15 @@ return dataAdd ? (
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {paginatedData.map((row, index) => (
-                <tr key={row.id}>
+                   <tr key={row.id || row.programId || index}> 
                   <td className="px-3 py-4 text-sm text-gray-500">{(currentPage - 1) * dataPerPage + index + 1}</td>
                   <td className="px-3 py-4">{row.title}</td>
                   <td className="px-3 py-4">{row.subtitle}</td>
                   <td className="px-3 py-4">{row.shortDescription}</td>
                   <td className="px-3 py-4">{row.description}</td>
                   <td className="px-3 py-4">
-                    {row.image && <img src={row.image || "/placeholder.svg"} alt="Program Image" />}
+                  {row.image && <img src={row.image} alt="Program Image" />}
+
                   </td>
                   <td className="px-3 py-4">{row.idealForDescription}</td>
                   <td className="px-3 py-4">{row.timelineDescription}</td>
@@ -258,6 +259,9 @@ return dataAdd ? (
             </tbody>
           </table>
         </div>
+
+
+
         <div className="mt-4 flex justify-end items-center space-x-4">
           <Button onClick={prevPage} disabled={currentPage === 1} className="bg-gray-500 text-white">
             Previous
@@ -277,7 +281,7 @@ return dataAdd ? (
       <p><strong>Title:</strong> {selectedSeoData.meta_title}</p>
       <p><strong>Description:</strong> {selectedSeoData.meta_description}</p>
       <p><strong>Keywords:</strong> {selectedSeoData.meta_keywords}</p>
-      <p><strong>OG Image:</strong></p>
+     
       <p><strong>Keywords:</strong> {selectedSeoData.og_title}</p>
       <div className="flex justify-center items-center mt-2">
       <img src={selectedSeoData.og_images} alt="OG Image" className="w-full h-auto" />

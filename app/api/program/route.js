@@ -70,7 +70,7 @@ export async function POST(request) {
 
     const programId = programResult.insertId;
 
-    // Log program insertion result
+   
     console.log('Program inserted with ID:', programId);
     console.log('Parsed Benefits:', parsedBenefits);
 

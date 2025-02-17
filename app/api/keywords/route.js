@@ -8,21 +8,18 @@ import { join, extname } from 'path';
   // API handler function
   export async function POST(request) {
     try {
-        const formData = await request.formData(); // Parse the incoming multipart form-data
+        const formData = await request.formData();
         const metaTitle = formData.get('metaTitle');
         const metaDescription = formData.get('metaDescription');
         const metaKeywords = formData.get('metaKeywords');
         const ogImages = formData.getAll('ogImage');
-        const og_title = formData.get('og_title');
-        console.log(formData);
-
+        const og_title = formData.get('og_title'); // ✅ यह ऐड किया
+        
         if (!metaTitle || !metaDescription || !ogImages.length) {
             return NextResponse.json({ error: "All required fields must be filled" }, { status: 400 });
         }
 
         let imagePaths = [];
-
-        // Handle image saving for multiple images
         if (ogImages.length > 0) {
             for (let i = 0; i < ogImages.length; i++) {
                 const image = ogImages[i];
@@ -38,16 +35,17 @@ import { join, extname } from 'path';
             }
         }
 
-        // Prepare SQL query to save data
         const insertQuery = `
             INSERT INTO seo (meta_title, meta_description, meta_keywords, og_images, og_title)
-            VALUES (?, ?, ?, ?,?);
+            VALUES (?, ?, ?, ?, ?);
         `;
+        
         const queryValues = [
             metaTitle,
             metaDescription,
             metaKeywords ? metaKeywords.split(',').map(k => k.trim()).join(',') : null,
-            JSON.stringify(imagePaths) // Save the image paths as a JSON array
+            JSON.stringify(imagePaths),
+            og_title // ✅ इसे जोड़ा
         ];
 
         const result = await queryPromise(insertQuery, queryValues);
@@ -61,6 +59,7 @@ import { join, extname } from 'path';
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+
 
 
 
