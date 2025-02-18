@@ -25,9 +25,9 @@ const ProgramList = () => {
 
 
   useEffect(() => {
-    const fetchProgramData = async (programId) => {
+    const fetchProgramData = async () => {
       try {
-        const response = await axios.get(`/api/program/${programId}`);
+        const response = await axios.get(`/api/program`);
         
         // Log the response to inspect its structure
         console.log('API Response:', response.data);
@@ -92,15 +92,7 @@ const ProgramList = () => {
   };
   
   
-  
 
-  
-
-
-
-
-  
-  
 
   // Add Data
   const handleAddData = (formData) => {
@@ -163,6 +155,28 @@ const ProgramList = () => {
   const nextPage = () => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
+
+
+ 
+
+  const SeohandleDelete = async (id) => {
+    try {
+      const response = await axios.delete(`/api/keywords/${id}`);
+      if (response.status === 200) {
+        setUserData(userData.filter((item) => item.id !== id));
+        alert(" seo Program deleted successfully!");
+      } else {
+        alert("Failed to delete the program seo.");
+      }
+    } catch (error) {
+      console.error("Error  seo deleting program:", error);
+      alert("There was an error seo deleting the program.");
+    }
+  };
+
+
+
+
 return dataAdd ? (
   <ProgramAdd
     data="Add Data"
@@ -274,19 +288,48 @@ return dataAdd ? (
           </Button>
         </div>
       </div>
-{showModal && selectedSeoData && (
+      {showModal && selectedSeoData && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-gray-100 p-6 rounded-lg max-w-lg w-full">
-      <h3 className="text-xl font-semibold mb-4">SEO Details</h3>
+    <div className="bg-gray-100 p-6 rounded-lg max-w-lg w-full relative">
+      
+      {/* Close Button */}
+      <button 
+        onClick={() => setShowModal(false)}
+        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl"
+      >
+        ✖
+      </button>
+
+      {/* Header */}
+      <h3 className="text-xl font-semibold mb-4 flex justify-between items-center">
+        SEO Details
+        <div className="flex gap-3">
+          {/* Edit Icon */}
+          <button onClick={() => handleEdit(selectedSeoData)}>
+            <i className="fas fa-edit text-blue-500 hover:text-blue-700 text-lg"></i>
+          </button>
+          {/* Delete Icon */}
+          <button onClick={() => SeohandleDelete(selectedSeoData.id)}>
+          <Trash2 className="h-5 w-5" />
+          </button>
+        </div>
+      </h3>
+
+      {/* SEO Details */}
       <p><strong>Title:</strong> {selectedSeoData.meta_title}</p>
       <p><strong>Description:</strong> {selectedSeoData.meta_description}</p>
       <p><strong>Keywords:</strong> {selectedSeoData.meta_keywords}</p>
-     
-      <p><strong>Keywords:</strong> {selectedSeoData.og_title}</p>
-      <div className="flex justify-center items-center mt-2">
-      <img src={selectedSeoData.og_images} alt="OG Image" className="w-full h-auto" />
+      <p><strong>OG Title:</strong> {selectedSeoData.og_title}</p>
+
+      {/* OG Images (Supports Multiple) */}
+      <div className="flex justify-center items-center mt-2 gap-2 flex-wrap">
+        {JSON.parse(selectedSeoData.og_images).map((img, index) => (
+          <img key={index} src={img} alt="OG Image" className="w-24 h-24 object-cover rounded-lg shadow-md" />
+        ))}
       </div>
-      <div className="mt-4">
+
+      {/* Close Button */}
+      <div className="mt-4 text-center">
         <button
           onClick={() => setShowModal(false)}
           className="px-4 py-2 text-white rounded"
@@ -295,6 +338,7 @@ return dataAdd ? (
           Close
         </button>
       </div>
+
     </div>
   </div>
 )}

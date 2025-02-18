@@ -59,11 +59,6 @@ import { join, extname } from 'path';
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
-
-
-
-
-
 export async function GET(req) {
     try {
         // Query to fetch all SEO data from the 'seo' table
@@ -96,66 +91,4 @@ export async function GET(req) {
     }
 }
 
-export async function PUT(req) {
-    try {
-        // Parse incoming request body
-        const body = await req.json();
-        console.log("Request Body:", body);
 
-        const { id, metaTitle, metaDescription, metaKeywords, ogImages } = body;
-
-        // Validate required fields
-        if (!id) {
-            console.log("Validation Failed: Missing ID");
-            return NextResponse.json({ error: "ID is required to update SEO data" }, { status: 400 });
-        }
-
-        if (!metaTitle || !metaDescription) {
-            console.log("Validation Failed: Missing required fields");
-            return NextResponse.json({ error: "metaTitle and metaDescription are required" }, { status: 400 });
-        }
-
-        // Prepare SQL query for updating SEO data
-        const updateQuery = `
-            UPDATE seo 
-            SET 
-                meta_title = ?, 
-                meta_description = ?, 
-                meta_keywords = ?, 
-                og_images = ?
-            WHERE 
-                id = ?;
-        `;
-
-        // Prepare query values
-        const queryValues = [
-            metaTitle,
-            metaDescription,
-            metaKeywords ? metaKeywords.join(",") : null,
-            ogImages ? JSON.stringify(ogImages) : null,
-            id
-        ];
-
-        console.log("SQL Query:", updateQuery);
-        console.log("Query Values:", queryValues);
-
-        // Execute the query
-        const result = await queryPromise(updateQuery, queryValues);
-
-        // Check if any row was affected
-        if (result.affectedRows === 0) {
-            console.log("No record found with the provided ID");
-            return NextResponse.json({ error: "No record found with the provided ID" }, { status: 404 });
-        }
-
-        // Return success response
-        return NextResponse.json({
-            message: "SEO data updated successfully",
-            result
-        });
-
-    } catch (error) {
-        console.error("Error updating SEO data:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-    }
-}

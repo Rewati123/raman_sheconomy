@@ -64,90 +64,6 @@ export async function PUT(request) {
   }
 }
 
-export async function GET(request) {
-  try {
-    // Fetch program data along with benefits and testimonials using JOIN
-    const programQuery = `
-      SELECT 
-        p.id AS programId,
-        p.title,
-        p.subtitle,
-        p.short_description,
-        p.description,
-        p.ideal_For_Description,
-        p.timeline_Description,
-        p.start_Date,
-        p.end_Date,
-        p.image,
-        b.id AS benefitId,
-        b.icon AS benefitIcon,
-        b.title AS benefitTitle,
-        b.description AS benefitDescription,
-        t.id AS testimonialId,
-        t.name AS testimonialName,
-        t.profile AS testimonialProfile,
-        t.designation AS testimonialDesignation,
-        t.message AS testimonialMessage
-      FROM Program p
-      LEFT JOIN Benefit b ON p.id = b.programId
-      LEFT JOIN Testimonial t ON p.id = t.programId
-    `;
-    
-    const programs = await queryPromise(programQuery); 
-
-    // Format the data into a structured response
-    const result = programs.reduce((acc, program) => {
-      let programData = acc.find(p => p.programId === program.programId);
-      
-      if (!programData) {
-        programData = {
-          programId: program.programId,
-          title: program.title,
-          subtitle: program.subtitle,
-          shortDescription: program.short_description,
-          description: program.description,
-          idealForDescription: program.ideal_For_Description,
-          timelineDescription: program.timeline_Description,
-          startDate: program.start_Date,
-          endDate: program.end_Date,
-          image: program.image,
-          benefits: [],
-          testimonials: []
-        };
-        acc.push(programData);
-      }
-
-      // Add benefit data if available
-      if (program.benefitId) {
-        programData.benefits.push({
-          benefitId: program.benefitId,
-          icon: program.benefitIcon,
-          title: program.benefitTitle,
-          description: program.benefitDescription
-        });
-      }
-
-      // Add testimonial data if available
-      if (program.testimonialId) {
-        programData.testimonials.push({
-          testimonialId: program.testimonialId,
-          name: program.testimonialName,
-          profile: program.testimonialProfile,
-          designation: program.testimonialDesignation,
-          message: program.testimonialMessage
-        });
-      }
-
-      return acc;
-    }, []);
-
-    // Return the structured data as a JSON response
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error fetching program data:', error);
-    return NextResponse.json({ message: 'Error fetching program data' }, { status: 500 });
-  }
-}
 
 export async function DELETE(request, { params }) {
   const url = new URL(request.url);
@@ -186,6 +102,8 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ message: 'Error deleting program', error: error.message || 'Unknown error' }, { status: 500 });
   }
 }
+
+
 
 
 
