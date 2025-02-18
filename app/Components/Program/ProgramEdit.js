@@ -115,7 +115,7 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
       </Button>
       <h1 className="text-2xl font-bold mb-4">{data}</h1>
   <form method="POST" onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
-      {/* Title and Subtitle in One Row */}
+
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col">
           <Label htmlFor="title">Title</Label>
@@ -140,8 +140,7 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
           />
         </div>
       </div>
-  
-      {/* Short Description and Description in One Row */}
+
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col">
           <Label htmlFor="shortDescription">Short Description</Label>
@@ -167,7 +166,7 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
         </div>
       </div>
   
-      {/* Image Upload */}
+    
       <div className="flex flex-col">
         <Label htmlFor="image">Upload Image</Label>
         <Input
@@ -180,7 +179,7 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
         />
       </div>
   
-      {/* Benefits Section */}
+    
       <div className="w-full">
         <Label>Benefits</Label>
         {formData.benefits.map((benefit, index) => (
@@ -231,7 +230,6 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
         </Button>
       </div>
   
-      {/* Ideal For Description, Timeline Description, Start Date, End Date Section */}
       <div className="w-full mt-8">
         <Label>Program Details</Label>
         <div className="flex flex-col space-y-4 mt-4">
@@ -284,7 +282,7 @@ const ProgramEdit = ({ data, setdataadd, onSubmit, eduData }) => {
         </div>
       </div>
   
-      {/* Testimonial Section */}
+ 
       <div className="w-full mt-8">
         <Label>Testimonial</Label>
         <div className="flex flex-col space-y-4 mt-4">
