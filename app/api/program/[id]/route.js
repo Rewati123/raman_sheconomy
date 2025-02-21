@@ -7,7 +7,7 @@ export async function PUT(request) {
     
     // Update Program Data
     const programUpdateQuery = `
-      UPDATE Program SET
+      UPDATE program SET
         title = ?, 
         subtitle = ?, 
         short_description = ?, 
@@ -27,7 +27,7 @@ export async function PUT(request) {
     if (benefits && benefits.length > 0) {
       const benefitUpdatePromises = benefits.map(benefit => {
         const benefitUpdateQuery = `
-          UPDATE Benefit SET
+          UPDATE benefit SET
             icon = ?, 
             title = ?, 
             description = ?
@@ -43,7 +43,7 @@ export async function PUT(request) {
     if (testimonials && testimonials.length > 0) {
       const testimonialUpdatePromises = testimonials.map(testimonial => {
         const testimonialUpdateQuery = `
-          UPDATE Testimonial SET
+          UPDATE testimonial SET
             name = ?, 
             profile = ?, 
             designation = ?, 
@@ -75,15 +75,15 @@ export async function DELETE(request, { params }) {
 
   try {
    
-    const deleteTestimonialsQuery = `DELETE FROM Testimonial WHERE programId = ?`;
+    const deleteTestimonialsQuery = `DELETE FROM testimonial WHERE programId = ?`;
     await queryPromise(deleteTestimonialsQuery, [programId]);
 
     
-    const deleteBenefitsQuery = `DELETE FROM Benefit WHERE programId = ?`;
+    const deleteBenefitsQuery = `DELETE FROM benefit WHERE programId = ?`;
     await queryPromise(deleteBenefitsQuery, [programId]);
 
  
-    const deleteProgramQuery = `DELETE FROM Program WHERE id = ?`;
+    const deleteProgramQuery = `DELETE FROM program WHERE id = ?`;
     const deleteResult = await queryPromise(deleteProgramQuery, [programId]);
 
     if (deleteResult.affectedRows === 0) {
