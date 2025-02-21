@@ -7,7 +7,7 @@ import ProgramAdd from "../../Components/Program/ProgramAdd";
 import ProgramEdit from "../../Components/Program/ProgramEdit";
 import { Eye, Trash2, Edit } from "lucide-react";
 import { MoreHorizontal } from "lucide-react"; 
-
+import ProgramDetails from "../../Components/Program/ProgramDetails ";
 import axios from "axios";
 
 const ProgramList = () => {
@@ -21,6 +21,7 @@ const ProgramList = () => {
   const [showModal, setShowModal] = useState(false); 
   const [selectedSeoData, setSelectedSeoData] = useState(null)
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const dataPerPage = 5;
 
 
@@ -44,21 +45,21 @@ const ProgramList = () => {
       }
     };
 
-    const fetchSeoData = async () => {
-      try {
-        const response = await axios.get(`/api/keywords`);
-        if (response.data) {
-          setSeoData(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching SEO data:', error);
-        alert('Could not fetch SEO data. Please check your API.');
-      }
-    };
+    // const fetchSeoData = async () => {
+    //   try {
+    //     const response = await axios.get(`/api/keywords`);
+    //     if (response.data) {
+    //       setSeoData(response.data);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching SEO data:', error);
+    //     alert('Could not fetch SEO data. Please check your API.');
+    //   }
+    // };
     
 
     fetchProgramData();
-    fetchSeoData(); // Fetch SEO data on component mount
+    // fetchSeoData(); // Fetch SEO data on component mount
   }, []);
   const handleSeoClick = (programId) => {
     const selectedSeo = seoData?.data.find((data) => data.program_id === programId);
@@ -246,7 +247,7 @@ return dataAdd ? (
                   <td className="px-3 py-4">{row.endDate}</td>
                   <td className="px-3 py-4 text-center">
                     <button className="text-blue-500 hover:text-blue-700">
-                      <Eye className="h-5 w-5" />
+                      <Eye className="h-5 w-5"  onClick={() => setSelectedProgram(row)} />
                     </button>
                     <button onClick={() => handleEdit(row)} className="text-blue-500 hover:text-blue-700 ml-3">
                       <Edit className="h-5 w-5" />
@@ -343,7 +344,9 @@ return dataAdd ? (
   </div>
 )}
 
-
+{selectedProgram && (
+        <ProgramDetails program={selectedProgram} onClose={() => setSelectedProgram(null)} />
+      )}
 
   </div>
 );

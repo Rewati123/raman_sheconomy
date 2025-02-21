@@ -5,7 +5,7 @@ import { queryPromise } from '@/lib/db';
 
   export async function GET() {
     try {
-      const query = 'SELECT id, fullName, email, phone,startupName,description,profileLink FROM Application ORDER BY id DESC';
+      const query = 'SELECT id, fullName, email, phone,startupName,description,profileLink FROM application ORDER BY id DESC';
       const videos = await queryPromise(query);
   
       return NextResponse.json(videos, { status: 200 });
