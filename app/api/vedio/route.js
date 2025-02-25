@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { put } from '@vercel/blob';
 import { queryPromise } from '@/lib/db';
 
 export const config = {
@@ -8,7 +7,6 @@ export const config = {
     bodyParser: false,
   },
 };
-
 
 export async function POST(request) {
   try {
@@ -31,30 +29,34 @@ export async function POST(request) {
       return NextResponse.json({ message: 'File size exceeds 100MB limit.' }, { status: 400 });
     }
 
+    // Convert video file to buffer
     const bytes = await video.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save the file
-    const filename = Date.now() + '-' + video.name;
-    const path = join(process.cwd(), 'public', 'uploads', filename);
-    await writeFile(path, buffer);
+    // Upload to Vercel Blob Storage
+    const blob = await put(`videos/${Date.now()}-${video.name}`, buffer, {
+      access: 'public',
+      contentType: video.type,
+    });
 
-    const videoUrl = `/uploads/${filename}`;
+    console.log('Video uploaded to Vercel Blob:', blob.url);
 
-    // Insert video details into the database using queryPromise
-    const query = 'INSERT INTO Video (title, description, url) VALUES (?, ?, ?)';
-    const result = await queryPromise(query, [title, description, videoUrl]);
+    // Insert video details into the database
+    const query = 'INSERT INTO video (title, description, url) VALUES (?, ?, ?)';
+    const result = await queryPromise(query, [title, description, blob.url]);
 
-    return NextResponse.json({ message: 'Video uploaded successfully!', videoId: result.insertId }, { status: 201 });
+    return NextResponse.json({ message: 'Video uploaded successfully!', videoUrl: blob.url }, { status: 201 });
+
   } catch (error) {
     console.error('Error uploading video:', error);
     return NextResponse.json({ message: 'Error uploading video.', error: error.message }, { status: 500 });
   }
 }
 
+
 export async function GET() {
     try {
-      const query = 'SELECT id, title, description, url FROM Video ORDER BY id DESC';
+      const query = 'SELECT id, title, description, url FROM video ORDER BY id DESC';
       const videos = await queryPromise(query);
   
       return NextResponse.json(videos, { status: 200 });

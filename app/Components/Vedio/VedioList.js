@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
-import VedioAdd from "../../Vedio/VedioAdd";
-import VedioEdit from "@Components/Vedio/VedioEdit";
+import VedioAdd from "../../Components/Vedio/VedioAdd";
+import VedioEdit from "../../Components/Vedio/VedioEdit";
 import { Eye, Trash2, Edit } from "lucide-react";
 import axios from "axios";
 
