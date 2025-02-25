@@ -9,7 +9,7 @@ export async function DELETE(request, { params }) {
         return NextResponse.json({ message: 'Video ID is required.' }, { status: 400 });
       }
   
-      const query = 'DELETE FROM Video WHERE id = ?';
+      const query = 'DELETE FROM video WHERE id = ?';
       const result = await queryPromise(query, [id]);
   
       if (result.affectedRows === 0) {
@@ -38,7 +38,7 @@ export async function PUT(request, { params }) {
       }
   
       // SQL query to update the video
-      const query = 'UPDATE Video SET title = ?, description = ?, url = ? WHERE id = ?';
+      const query = 'UPDATE video SET title = ?, description = ?, url = ? WHERE id = ?';
       const result = await queryPromise(query, [title, description, url, id]);
   
       if (result.affectedRows === 0) {
