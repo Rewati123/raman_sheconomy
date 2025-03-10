@@ -1,10 +1,10 @@
 
-import Deshboard from "./Components/Deshboard"
+import Login from "./Components/Login";
 export default function Home() {
   return (
    <>
  
-   <Deshboard/>
+  <Login/>
    
    </>
   );

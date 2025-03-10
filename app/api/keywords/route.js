@@ -1,64 +1,68 @@
 import { NextResponse } from "next/server";
-import { queryPromise } from '@/lib/db'; 
-import { mkdir, writeFile } from 'fs/promises';
-import { join, extname } from 'path';
+import { queryPromise } from "@/lib/db";
+import { put } from "@vercel/blob"; // ✅ Vercel Blob import kiya
 
-
-  
-  // API handler function
-  export async function POST(request) {
+export async function POST(request) {
     try {
         const formData = await request.formData();
-        const metaTitle = formData.get('metaTitle');
-        const metaDescription = formData.get('metaDescription');
-        const metaKeywords = formData.get('metaKeywords');
-        const ogImages = formData.getAll('ogImage');
-        const og_title = formData.get('og_title'); // ✅ यह ऐड किया
-        
+        const metaTitle = formData.get("metaTitle");
+        const metaDescription = formData.get("metaDescription");
+        const metaKeywords = formData.get("metaKeywords");
+        const ogImages = formData.getAll("ogImage");
+        const og_title = formData.get("og_title");
+
         if (!metaTitle || !metaDescription || !ogImages.length) {
-            return NextResponse.json({ error: "All required fields must be filled" }, { status: 400 });
+            return NextResponse.json(
+                { error: "All required fields must be filled" },
+                { status: 400 }
+            );
         }
 
         let imagePaths = [];
         if (ogImages.length > 0) {
             for (let i = 0; i < ogImages.length; i++) {
                 const image = ogImages[i];
-                const imageExtension = extname(image.name);
-                const imageName = `${Date.now()}-${i}${imageExtension}`;
-                const imageDir = join(process.cwd(), 'public', 'uploads');
-                const imageFilePath = join(imageDir, imageName);
 
-                await mkdir(imageDir, { recursive: true });
-                await writeFile(imageFilePath, Buffer.from(await image.arrayBuffer()));
+                // ✅ Blob Storage me upload karne ke liye `put` ka use
+                const blob = await put(`seo/${Date.now()}-${i}-${image.name}`, image, {
+                    access: "public",
+                });
 
-                imagePaths.push(`/uploads/${imageName}`);
+                imagePaths.push(blob.url);
             }
         }
 
+        // ✅ SQL Query with Blob URL
         const insertQuery = `
             INSERT INTO seo (meta_title, meta_description, meta_keywords, og_images, og_title)
             VALUES (?, ?, ?, ?, ?);
         `;
-        
+
         const queryValues = [
             metaTitle,
             metaDescription,
-            metaKeywords ? metaKeywords.split(',').map(k => k.trim()).join(',') : null,
+            metaKeywords ? metaKeywords.split(",").map(k => k.trim()).join(",") : null,
             JSON.stringify(imagePaths),
-            og_title // ✅ इसे जोड़ा
+            og_title,
         ];
 
         const result = await queryPromise(insertQuery, queryValues);
 
         return NextResponse.json({
             message: "SEO data inserted successfully",
-            result
+            result,
+            imagePaths,
         });
     } catch (error) {
         console.error("Error inserting SEO data:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+
+
+
+
+
 export async function GET(req) {
     try {
         // Query to fetch all SEO data from the 'seo' table

@@ -120,16 +120,16 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         }
       });
   
-      // **SEO Images**
-      // form.append("metaTitle", seoData.metaTitle)
-      // form.append("metaDescription", seoData.metaDescription)
-      // form.append("metaKeywords", seoData.metaKeywords)
-  
-      // if (seoData.ogImages && seoData.ogImages.length > 0) {
-      //   seoData.ogImages.forEach((image) => {
-      //     form.append("ogImage", image)
-      //   })
-      // }
+     
+      form.append("metaTitle", seoData.metaTitle)
+      form.append("metaDescription", seoData.metaDescription)
+      form.append("metaKeywords", seoData.metaKeywords)
+      form.append("ogTitle", seoData.ogTitle);
+      if (seoData.ogImages && seoData.ogImages.length > 0) {
+        seoData.ogImages.forEach((image) => {
+          form.append("ogImage", image)
+        })
+      }
 
 
 
@@ -140,13 +140,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         },
       });
       console.log("Program added successfully", response.data)
-      // const seoResponse = await axios.post("/api/keywords", form, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data",
-      //   },
-      // })
-
-      // console.log("SEO data added successfully", seoResponse.data)
+    
       setdataadd(false);
     } catch (error) {
       console.error("Error adding program", error);
@@ -375,14 +369,9 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="seo">
-          <AccordionTrigger>SEO Information</AccordionTrigger>
-          <AccordionContent>
-          <Seo onSeoChange={handleSeoChange} />
-          </AccordionContent>
-        </AccordionItem>
+       
       </Accordion>
-
+      <Seo onSeoChange={handleSeoChange} />
       <div className="flex justify-end space-x-4">
         <Button type="button" variant="outline" onClick={() => setdataadd(false)}>
           Cancel

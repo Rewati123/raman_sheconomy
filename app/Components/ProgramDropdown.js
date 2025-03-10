@@ -1,20 +1,25 @@
-"use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
-export default function ProgramDropdown() {
+const ProgramDropdown = ({ totalPrograms, onProgramSelect }) => {
   const [selectedProgram, setSelectedProgram] = useState("");
 
-  const programs = [
-    { id: 1, name: "Program 1" },
-    { id: 2, name: "Program 2" },
-    { id: 3, name: "Program 3" },
-    { id: 4, name: "Program 4" },
-  ];
+  const generateProgramOptions = () => {
+    const maxPrograms = Math.min(4, totalPrograms);
+    return Array.from({ length: maxPrograms }, (_, index) => ({
+      id: index + 1,
+      name: `${index + 1} Programs`,
+      value: (index + 1).toString()
+    }));
+  };
+
+  const programs = generateProgramOptions();
 
   const handleChange = (event) => {
-    setSelectedProgram(event.target.value);
-    console.log("Selected Program:", event.target.value);
+    const value = event.target.value;
+    setSelectedProgram(value);
+    onProgramSelect(value); 
   };
+  
 
   return (
     <div className="p-4 flex flex-col items-center">
@@ -22,7 +27,7 @@ export default function ProgramDropdown() {
         className="text-white font-semibold text-lg px-3 py-1 rounded-md mb-2"
         style={{ backgroundColor: "#FF7F42" }}
       >
-        Select Program
+        Select Program 
       </label>
       <select
         className="w-60 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700 font-medium bg-white shadow-md"
@@ -30,14 +35,16 @@ export default function ProgramDropdown() {
         onChange={handleChange}
       >
         <option value="" disabled>
-          -- Choose a Program --
+          -- Choose  of programs --
         </option>
         {programs.map((program) => (
-          <option key={program.id} value={program.name}>
+          <option key={program.id} value={program.value}>
             {program.name}
           </option>
         ))}
       </select>
     </div>
   );
-}
+};
+
+export default ProgramDropdown;

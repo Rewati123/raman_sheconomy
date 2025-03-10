@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState,useEffect  } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/Components/ui/accordion";
 import axios from "axios";
-
+import SeoEdit from "./SeoEdit";
 const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: eduData?.title || "",
@@ -20,8 +20,15 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
     startDate: eduData?.startDate || "",
     endDate: eduData?.endDate || "",
     testimonials: eduData?.testimonials || [{ name: "", designation: "", message: "", profile: null }],
-  });
+    seoData: eduData?.seo || { metaTitle: "", metaDescription: "", ogTitle: "", metaKeywords: [], ogImages: [] }
 
+    
+  });
+  
+
+  
+  
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -58,24 +65,94 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
     }));
   };
 
+
+
+  const handleSeoChange = (updatedSeoData) => {
+    setFormData((prev) => ({
+      ...prev,
+      seoData: {
+        ...prev.seoData,  
+        ...updatedSeoData, 
+      },
+    }));
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataObj = new FormData();
-    Object.keys(formData).forEach((key) => {
-      if (key === "benefits" || key === "testimonials") {
-        formData[key].forEach((item, index) => {
-          Object.keys(item).forEach((subKey) => {
-            formDataObj.append(`${key}[${index}][${subKey}]`, item[subKey]);
-          });
-        });
-      } else {
-        formDataObj.append(key, formData[key]);
-      }
-    });
 
-    await axios.post("/api/update-program", formDataObj);
-    setdataadd(false);
-  };
+    try {
+        const formDataToSend = new FormData();
+        formDataToSend.append("title", formData.title);
+        formDataToSend.append("subtitle", formData.subtitle);
+        formDataToSend.append("shortDescription", formData.shortDescription);
+        formDataToSend.append("description", formData.description);
+        formDataToSend.append("idealForDescription", formData.idealForDescription);
+        formDataToSend.append("timelineDescription", formData.timelineDescription);
+        formDataToSend.append("startDate", formData.startDate);
+        formDataToSend.append("endDate", formData.endDate);
+
+        if (formData.image) {
+            formDataToSend.append("image", formData.image);
+        }
+
+        formData.benefits.forEach((benefit, index) => {
+            formDataToSend.append(`benefits[${index}][title]`, benefit.title);
+            formDataToSend.append(`benefits[${index}][description]`, benefit.description);
+            if (benefit.icon) {
+                formDataToSend.append(`benefits[${index}][icon]`, benefit.icon);
+            }
+        });
+
+        formData.testimonials.forEach((testimonial, index) => {
+            formDataToSend.append(`testimonials[${index}][name]`, testimonial.name);
+            formDataToSend.append(`testimonials[${index}][designation]`, testimonial.designation);
+            formDataToSend.append(`testimonials[${index}][message]`, testimonial.message);
+            if (testimonial.profile) {
+                formDataToSend.append(`testimonials[${index}][profile]`, testimonial.profile);
+            }
+        });
+
+        formDataToSend.append("metaTitle", formData.seoData.metaTitle);
+        formDataToSend.append("metaDescription", formData.seoData.metaDescription);
+        formDataToSend.append("ogTitle", formData.seoData.ogTitle);
+
+        if (formData.seoData.metaKeywords.length > 0) {
+            formDataToSend.append("metaKeywords", JSON.stringify(formData.seoData.metaKeywords));
+        }
+
+        if (formData.seoData.ogImages.length > 0) {
+            formData.seoData.ogImages.forEach((image, index) => {
+                formDataToSend.append(`ogImages[${index}]`, image);
+            });
+        }
+
+        const response = await axios.put("/api/program", formDataToSend, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            
+            },
+        });
+
+        if (response.status === 200) {
+            console.log("Program updated successfully");
+            setdataadd(false);
+            if (onSubmit) onSubmit();
+        }
+    } catch (error) {
+        console.error("Error updating program:", error);
+    }
+};
+
+
+
+
+
+  
+  console.log("eduData:", eduData);
+ 
+  console.log("SEO Data from API:", eduData?.seo);
+ 
+  
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 p-6">
@@ -144,6 +221,7 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+      <SeoEdit seoData={formData.seoData} onSeoChange={handleSeoChange} />
 
       <div className="flex justify-end space-x-4">
         <Button type="button" variant="outline" onClick={() => setdataadd(false)}>Cancel</Button>

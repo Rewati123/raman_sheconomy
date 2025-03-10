@@ -8,6 +8,7 @@ import ProgramEdit from "../../Components/Program/ProgramEdit";
 import { Eye, Trash2, Edit } from "lucide-react";
 import { MoreHorizontal } from "lucide-react"; 
 import ProgramDetails from "../../Components/Program/ProgramDetails ";
+import ProgramDropdown from "../../Components/ProgramDropdown"
 import axios from "axios";
 
 const ProgramList = () => {
@@ -22,6 +23,8 @@ const ProgramList = () => {
   const [selectedSeoData, setSelectedSeoData] = useState(null)
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [programSelcet,setProgramSelcet] = useState ("")
+  
   const dataPerPage = 5;
 
 
@@ -45,29 +48,14 @@ const ProgramList = () => {
       }
     };
 
-    // const fetchSeoData = async () => {
-    //   try {
-    //     const response = await axios.get(`/api/keywords`);
-    //     if (response.data) {
-    //       setSeoData(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching SEO data:', error);
-    //     alert('Could not fetch SEO data. Please check your API.');
-    //   }
-    // };
+   
     
 
     fetchProgramData();
-    // fetchSeoData(); // Fetch SEO data on component mount
+   
   }, []);
-  const handleSeoClick = (programId) => {
-    const selectedSeo = seoData?.data.find((data) => data.program_id === programId);
-    if (selectedSeo) {
-      setSelectedSeoData(selectedSeo);
-      setShowModal(true); // Open the modal with SEO details
-    }
-  };
+ 
+ 
   // Delete Data
   const handleDelete = async (programId) => {
     if (!programId) {
@@ -160,20 +148,7 @@ const ProgramList = () => {
 
  
 
-  const SeohandleDelete = async (id) => {
-    try {
-      const response = await axios.delete(`/api/keywords/${id}`);
-      if (response.status === 200) {
-        setUserData(userData.filter((item) => item.id !== id));
-        alert(" seo Program deleted successfully!");
-      } else {
-        alert("Failed to delete the program seo.");
-      }
-    } catch (error) {
-      console.error("Error  seo deleting program:", error);
-      alert("There was an error seo deleting the program.");
-    }
-  };
+
 
 
 
@@ -201,12 +176,10 @@ return dataAdd ? (
         placeholder="Search"
         className="w-80"
       />
+ 
       <Button onClick={() => setDataAdd(true)} style={{ backgroundColor: '#FF7F42' }}>Add Program</Button>
   
         
-
-    
-
 
     </div>
 
@@ -226,7 +199,7 @@ return dataAdd ? (
                 <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Start Date</th>
                 <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">End Date</th>
                 <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions</th>
-                <th className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">SEO</th>
+              
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
@@ -264,11 +237,7 @@ return dataAdd ? (
 
 
                   </td>
-                  <td className="px-3 py-4 text-center">
-                    <button onClick={() => handleSeoClick(row.id)} className="ml-3 text-gray-500 hover:text-gray-700">
-                      <MoreHorizontal className="h-5 w-5" />
-                    </button>
-                  </td>
+             
                 </tr>
               ))}
             </tbody>
@@ -289,60 +258,10 @@ return dataAdd ? (
           </Button>
         </div>
       </div>
-      {showModal && selectedSeoData && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-gray-100 p-6 rounded-lg max-w-lg w-full relative">
+
+
+
       
-      {/* Close Button */}
-      <button 
-        onClick={() => setShowModal(false)}
-        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl"
-      >
-        ✖
-      </button>
-
-      {/* Header */}
-      <h3 className="text-xl font-semibold mb-4 flex justify-between items-center">
-        SEO Details
-        <div className="flex gap-3">
-          {/* Edit Icon */}
-          <button onClick={() => handleEdit(selectedSeoData)}>
-            <i className="fas fa-edit text-blue-500 hover:text-blue-700 text-lg"></i>
-          </button>
-          {/* Delete Icon */}
-          <button onClick={() => SeohandleDelete(selectedSeoData.id)}>
-          <Trash2 className="h-5 w-5" />
-          </button>
-        </div>
-      </h3>
-
-      {/* SEO Details */}
-      <p><strong>Title:</strong> {selectedSeoData.meta_title}</p>
-      <p><strong>Description:</strong> {selectedSeoData.meta_description}</p>
-      <p><strong>Keywords:</strong> {selectedSeoData.meta_keywords}</p>
-      <p><strong>OG Title:</strong> {selectedSeoData.og_title}</p>
-
-      {/* OG Images (Supports Multiple) */}
-      <div className="flex justify-center items-center mt-2 gap-2 flex-wrap">
-        {JSON.parse(selectedSeoData.og_images).map((img, index) => (
-          <img key={index} src={img} alt="OG Image" className="w-24 h-24 object-cover rounded-lg shadow-md" />
-        ))}
-      </div>
-
-      {/* Close Button */}
-      <div className="mt-4 text-center">
-        <button
-          onClick={() => setShowModal(false)}
-          className="px-4 py-2 text-white rounded"
-          style={{ backgroundColor: '#FF7F42' }}
-        >
-          Close
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
 
 {selectedProgram && (
         <ProgramDetails program={selectedProgram} onClose={() => setSelectedProgram(null)} />
