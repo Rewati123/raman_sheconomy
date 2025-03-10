@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation"; 
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/Components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { FaUserCircle } from "react-icons/fa"; 
 
 const Header = () => {
