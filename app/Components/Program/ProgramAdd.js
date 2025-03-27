@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Seo from "./Seo"
 import axios from "axios"
 import { saveImage } from '../../../utils/imageUpload'
+import { X, Trash2 } from "lucide-react" // Import Trash2 icon for delete button
 
 const ProgramAdd = ({ setdataadd, onSubmitData }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,15 +19,17 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
     timelineDescription: "",
     startDate: "",
     endDate: "",
-    benefits: [{ title: "", description: "", icon: null }],
-    testimonials: [{ name: "", profile: null, designation: "", message: "" }],
+    benefits: [{ title: "", description: "", icon: null, preview: null }],
+    testimonials: [{ name: "", profile: null, designation: "", message: "", preview: null }],
     image: null,
+    imagePreview: null,
   })
   const [seoData, setSeoData] = useState({
     metaTitle: "",
     metaDescription: "",
     og_title: "",
     metaKeywords: [],
+    ogDescription: "",
     ogImages: [],
   })
 
@@ -38,12 +41,41 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
     }))
   }
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const preview = URL.createObjectURL(file)
+      setFormData(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: preview
+      }))
+    }
+  }
+
+  const handleImageDelete = () => {
+    setFormData(prev => ({
+      ...prev,
+      image: null,
+      imagePreview: null
+    }))
+  }
+
   const handleBenefitChange = (index, field, value) => {
     setFormData((prev) => {
       const newBenefits = [...prev.benefits]
-      newBenefits[index] = {
-        ...newBenefits[index],
-        [field]: value,
+      if (field === 'icon' && value instanceof File) {
+        const preview = URL.createObjectURL(value)
+        newBenefits[index] = {
+          ...newBenefits[index],
+          icon: value,
+          preview: preview
+        }
+      } else {
+        newBenefits[index] = {
+          ...newBenefits[index],
+          [field]: value,
+        }
       }
       return {
         ...prev,
@@ -52,12 +84,53 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
     })
   }
 
+  const handleBenefitDelete = (index) => {
+    setFormData((prev) => {
+      const newBenefits = [...prev.benefits]
+      if (newBenefits[index].preview) {
+        URL.revokeObjectURL(newBenefits[index].preview)
+      }
+      newBenefits.splice(index, 1)
+      return {
+        ...prev,
+        benefits: newBenefits
+      }
+    })
+  }
+
+  const handleBenefitImageDelete = (index) => {
+    setFormData((prev) => {
+      const newBenefits = [...prev.benefits]
+      if (newBenefits[index].preview) {
+        URL.revokeObjectURL(newBenefits[index].preview)
+      }
+      newBenefits[index] = {
+        ...newBenefits[index],
+        icon: null,
+        preview: null
+      }
+      return {
+        ...prev,
+        benefits: newBenefits
+      }
+    })
+  }
+
   const handleTestimonialChange = (index, field, value) => {
     setFormData((prev) => {
       const newTestimonials = [...prev.testimonials]
-      newTestimonials[index] = {
-        ...newTestimonials[index],
-        [field]: value,
+      if (field === 'profile' && value instanceof File) {
+        const preview = URL.createObjectURL(value)
+        newTestimonials[index] = {
+          ...newTestimonials[index],
+          profile: value,
+          preview: preview
+        }
+      } else {
+        newTestimonials[index] = {
+          ...newTestimonials[index],
+          [field]: value,
+        }
       }
       return {
         ...prev,
@@ -66,14 +139,36 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
     })
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFormData(prev => ({
+  const handleTestimonialDelete = (index) => {
+    setFormData((prev) => {
+      const newTestimonials = [...prev.testimonials]
+      if (newTestimonials[index].preview) {
+        URL.revokeObjectURL(newTestimonials[index].preview)
+      }
+      newTestimonials.splice(index, 1)
+      return {
         ...prev,
-        image: file
-      }))
-    }
+        testimonials: newTestimonials
+      }
+    })
+  }
+
+  const handleTestimonialImageDelete = (index) => {
+    setFormData((prev) => {
+      const newTestimonials = [...prev.testimonials]
+      if (newTestimonials[index].preview) {
+        URL.revokeObjectURL(newTestimonials[index].preview)
+      }
+      newTestimonials[index] = {
+        ...newTestimonials[index],
+        profile: null,
+        preview: null
+      }
+      return {
+        ...prev,
+        testimonials: newTestimonials
+      }
+    })
   }
 
   const handleSeoChange = (newSeoData) => {
@@ -96,12 +191,10 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
       form.append("startDate", formData.startDate);
       form.append("endDate", formData.endDate);
   
-      // **Program Image**
       if (formData.image) {
         form.append("image", formData.image);
       }
   
-      // **Benefits Images**
       formData.benefits.forEach((benefit, index) => {
         form.append(`benefits[${index}][title]`, benefit.title);
         form.append(`benefits[${index}][description]`, benefit.description);
@@ -110,7 +203,6 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         }
       });
   
-      // **Testimonials Images**
       formData.testimonials.forEach((testimonial, index) => {
         form.append(`testimonials[${index}][name]`, testimonial.name);
         form.append(`testimonials[${index}][designation]`, testimonial.designation);
@@ -120,19 +212,16 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         }
       });
   
-     
       form.append("metaTitle", seoData.metaTitle)
       form.append("metaDescription", seoData.metaDescription)
       form.append("metaKeywords", seoData.metaKeywords)
-      form.append("ogTitle", seoData.ogTitle);
+      form.append("ogDescription", seoData.ogDescription)
+      form.append("ogTitle", seoData.og_title);
       if (seoData.ogImages && seoData.ogImages.length > 0) {
         seoData.ogImages.forEach((image) => {
           form.append("ogImage", image)
         })
       }
-
-
-
 
       const response = await axios.post("/api/program", form, {
         headers: {
@@ -148,7 +237,6 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
       setIsSubmitting(false);
     }
   };
-  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 p-6">
@@ -200,14 +288,32 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
               </div>
               <div>
                 <Label htmlFor="image">Program Image</Label>
-                <Input
-                  id="image"
-                  name="image"
-                  type="file"
-                  onChange={handleImageChange}
-                  accept="image/*"
-                  required
-                />
+                <div className="space-y-2">
+                  <Input
+                    id="image"
+                    name="image"
+                    type="file"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                    required={!formData.image}
+                  />
+                  {formData.imagePreview && (
+                    <div className="relative w-40 h-40">
+                      <img
+                        src={formData.imagePreview}
+                        alt="Program preview"
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleImageDelete}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </AccordionContent>
@@ -272,105 +378,156 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
             </div>
           </AccordionContent>
         </AccordionItem>
-
-        <AccordionItem value="benefits">
-          <AccordionTrigger>Benefits</AccordionTrigger>
-          <AccordionContent>
-            {formData.benefits.map((benefit, index) => (
-              <div key={index} className="space-y-4 mb-4 p-4 border rounded-md">
-                <div>
-                  <Label>Benefit Title</Label>
-                  <Input
-                    value={benefit.title}
-                    onChange={(e) => handleBenefitChange(index, 'title', e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Benefit Description</Label>
-                  <textarea
-                    value={benefit.description}
-                    onChange={(e) => handleBenefitChange(index, 'description', e.target.value)}
-                    required
-                    className="w-full min-h-[100px] p-2 border rounded-md"
-                  />
-                </div>
-                <div>
-                  <Label>Icon</Label>
-                  <Input
-                    type="file"
-                    onChange={(e) => handleBenefitChange(index, 'icon', e.target.files?.[0])}
-                    accept="image/*"
-                  />
-                </div>
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => setFormData(prev => ({
-                ...prev,
-                benefits: [...prev.benefits, { title: "", description: "", icon: null }]
-              }))}
-            >
-              Add Benefit
-            </Button>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="testimonials">
-          <AccordionTrigger>Testimonials</AccordionTrigger>
-          <AccordionContent>
-            {formData.testimonials.map((testimonial, index) => (
-              <div key={index} className="space-y-4 mb-4 p-4 border rounded-md">
-                <div>
-                  <Label>Name</Label>
-                  <Input
-                    value={testimonial.name}
-                    onChange={(e) => handleTestimonialChange(index, 'name', e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Designation</Label>
-                  <Input
-                    value={testimonial.designation}
-                    onChange={(e) => handleTestimonialChange(index, 'designation', e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Message</Label>
-                  <textarea
-                    value={testimonial.message}
-                    onChange={(e) => handleTestimonialChange(index, 'message', e.target.value)}
-                    required
-                    className="w-full min-h-[100px] p-2 border rounded-md"
-                  />
-                </div>
-                <div>
-                  <Label>Profile Picture</Label>
-                  <Input
-                    type="file"
-                    onChange={(e) => handleTestimonialChange(index, 'profile', e.target.files?.[0])}
-                    accept="image/*"
-                  />
-                </div>
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => setFormData(prev => ({
-                ...prev,
-                testimonials: [...prev.testimonials, { name: "", designation: "", message: "", profile: null }]
-              }))}
-            >
-              Add Testimonial
-            </Button>
-          </AccordionContent>
-        </AccordionItem>
-
-       
       </Accordion>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Benefits</h2>
+        {formData.benefits.map((benefit, index) => (
+          <div key={index} className="border rounded-lg p-4 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-md font-medium">Benefit {index + 1}</h3>
+              <button
+                type="button"
+                onClick={() => handleBenefitDelete(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+            <div>
+              <Label>Title</Label>
+              <Input
+                value={benefit.title}
+                onChange={(e) => handleBenefitChange(index, 'title', e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label>Description</Label>
+              <textarea
+                value={benefit.description}
+                onChange={(e) => handleBenefitChange(index, 'description', e.target.value)}
+                required
+                className="w-full min-h-[100px] p-2 border rounded-md"
+              />
+            </div>
+            <div>
+              <Label>Icon</Label>
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  onChange={(e) => handleBenefitChange(index, 'icon', e.target.files?.[0])}
+                  accept="image/*"
+                />
+                {benefit.preview && (
+                  <div className="relative w-24 h-24">
+                    <img
+                      src={benefit.preview}
+                      alt={`Benefit ${index + 1} icon`}
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleBenefitImageDelete(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+        <Button
+          type="button"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            benefits: [...prev.benefits, { title: "", description: "", icon: null, preview: null }]
+          }))}
+        >
+          Add Benefit
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Testimonials</h2>
+        {formData.testimonials.map((testimonial, index) => (
+          <div key={index} className="border rounded-lg p-4 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-md font-medium">Testimonial {index + 1}</h3>
+              <button
+                type="button"
+                onClick={() => handleTestimonialDelete(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+            <div>
+              <Label>Name</Label>
+              <Input
+                value={testimonial.name}
+                onChange={(e) => handleTestimonialChange(index, 'name', e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label>Designation</Label>
+              <Input
+                value={testimonial.designation}
+                onChange={(e) => handleTestimonialChange(index, 'designation', e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label>Message</Label>
+              <textarea
+                value={testimonial.message}
+                onChange={(e) => handleTestimonialChange(index, 'message', e.target.value)}
+                required
+                className="w-full min-h-[100px] p-2 border rounded-md"
+              />
+            </div>
+            <div>
+              <Label>Profile Picture</Label>
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  onChange={(e) => handleTestimonialChange(index, 'profile', e.target.files?.[0])}
+                  accept="image/*"
+                />
+                {testimonial.preview && (
+                  <div className="relative w-24 h-24">
+                    <img
+                      src={testimonial.preview}
+                      alt={`${testimonial.name}'s profile`}
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleTestimonialImageDelete(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+        <Button
+          type="button"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            testimonials: [...prev.testimonials, { name: "", designation: "", message: "", profile: null, preview: null }]
+          }))}
+        >
+          Add Testimonial
+        </Button>
+      </div>
+
       <Seo onSeoChange={handleSeoChange} />
       <div className="flex justify-end space-x-4">
         <Button type="button" variant="outline" onClick={() => setdataadd(false)}>

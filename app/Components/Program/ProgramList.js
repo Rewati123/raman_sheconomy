@@ -95,26 +95,10 @@ const ProgramList = () => {
     setEditData(data);
   };
 
-  const handleUpdate = async (updatedData) => {
-    try {
-   
-      const response = await axios.put(`/api/program/${updatedData.id}`, updatedData); // Adjust endpoint as needed
-      if (response.status === 200) {
-       
-        const updatedList = userData.map((data) =>
-          data.id === updatedData.id ? updatedData : data
-        );
-        setUserData(updatedList);
-        setEditData(null); 
-        alert("Program updated successfully!");
-      } else {
-        alert("Failed to update the program.");
-      }
-    } catch (error) {
-      console.error("Error updating program:", error);
-      alert("There was an error updating the program.");
-    }
+  const handleUpdate = (data) => {
+    console.log("Update function called with data:", data);
   };
+  
   // Search Functionality
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);

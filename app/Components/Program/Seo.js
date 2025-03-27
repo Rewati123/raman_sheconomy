@@ -16,7 +16,7 @@ const Seo = ({ onSeoChange }) => {
   const [metaDescription, setMetaDescription] = useState("")
 
   const [ogTitle, setOgTitle] = useState("")
- 
+  const [ogDescription, setOgDescription] = useState("");
   const inputRef = useRef(null)
 
   const toggleAccordion = (index) => {
@@ -264,7 +264,18 @@ const Seo = ({ onSeoChange }) => {
             />
           </div>
 
-  
+          <div>
+  <Label htmlFor="og-description">OG Description</Label>
+  <Textarea
+    id="og-description"
+    placeholder="Enter OG Description"
+    value={ogDescription}
+    onChange={(e) => {
+      setOgDescription(e.target.value);
+      updateSeoData({ ogDescription: e.target.value });
+    }}
+  />
+</div>
         </div>
       )}
            

@@ -75,7 +75,7 @@ const ProgramDetails = ({ program, onClose }) => {
           <p><strong>Description:</strong> {program?.seo?.metaDescription || "N/A"}</p>
           <p><strong>Keywords:</strong> {metaKeywords}</p>
           <p><strong>OG Title:</strong> {program?.seo?.ogTitle || "N/A"}</p>
-
+          <p><strong>OG Description:</strong> {program?.seo?.ogDescription || "N/A"}</p> 
           {/* OG Images (अगर Null ना हो) */}
           <p><strong>OG Images:</strong></p>
           {ogImages.length > 0 ? (
