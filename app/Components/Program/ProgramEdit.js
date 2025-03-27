@@ -8,6 +8,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import axios from "axios";
 import SeoEdit from "./SeoEdit";
 import { X, Trash2 } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify"; // ✅ Toastify Import
+import "react-toastify/dist/ReactToastify.css"; // ✅ Toastify CSS
 
 const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -232,12 +234,13 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
       });
 
       if (response.status === 200 && response.data.success !== false) {
-        alert("Program updated successfully!");
+       
+          toast.success(data.message || "Program updated  successfully!");
         if (onSubmit) {
           onSubmit(response.data);
         }
       } else {
-        alert("No changes detected. Update not performed.");
+          toast.error(data.message || "No changes detected. Update not performed.");
       }
     } catch (error) {
       console.error("Error updating program:", error);
@@ -247,7 +250,10 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 p-6">
+
+    <>
+        <ToastContainer />
+        <form onSubmit={handleSubmit} className="space-y-8 p-6">
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="basic-info">
           <AccordionTrigger>Basic Information</AccordionTrigger>
@@ -495,6 +501,9 @@ const ProgramEdit = ({ eduData, setdataadd, onSubmit }) => {
         <Button type="submit">Save Program</Button>
       </div>
     </form>
+    
+    </>
+  
   );
 };
 

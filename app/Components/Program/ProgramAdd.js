@@ -6,7 +6,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Seo from "./Seo"
 import axios from "axios"
 import { saveImage } from '../../../utils/imageUpload'
-import { X, Trash2 } from "lucide-react" // Import Trash2 icon for delete button
+import { X, Trash2 } from "lucide-react" 
+import { ToastContainer, toast } from "react-toastify"; // ✅ Toastify Import
+import "react-toastify/dist/ReactToastify.css"; // ✅ Toastify CSS
 
 const ProgramAdd = ({ setdataadd, onSubmitData }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -229,16 +231,22 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         },
       });
       console.log("Program added successfully", response.data)
-    
+      toast.success(data.message || "Program added  successfully!");
       setdataadd(false);
     } catch (error) {
       console.error("Error adding program", error);
+      toast.error(data.message || "Error adding program");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
+
+
+    <>
+    
+    <ToastContainer />
     <form onSubmit={handleSubmit} className="space-y-8 p-6">
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="basic-info">
@@ -538,6 +546,8 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         </Button>
       </div>
     </form>
+    </>
+   
   )
 }
 
