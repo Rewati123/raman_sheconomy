@@ -1,115 +1,97 @@
+
+
+
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Next.js router for navigation
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const router = useRouter(); // Router instance
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    if (!email || !password) {
+      toast.error("Please enter both email and password!");
+      return;
+    }
 
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        toast.success("Login Successful! ");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        toast.error(data.message || "Login Failed!");
       }
-
-     
-      localStorage.setItem("token", data.token);
-
-      alert("Login Successful 🎉");
-
-     
-      router.push("/dashboard");
-
     } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      toast.error("Something went wrong!");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-white mb-6">
-          Welcome Back! 👋
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+      <ToastContainer position="top-right" autoClose={2000} />
+      <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          Learning Center
         </h2>
-
-        {error && (
-          <p className="text-red-500 text-center mb-4">{error}</p>
-        )}
-
         <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-700 font-medium mb-2">
               Email Address
             </label>
             <input
               type="email"
-              className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-gray-700 font-medium mb-2">
               Password
             </label>
             <input
               type="password"
-              className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300"
-            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
           >
-            {loading ? "Logging in..." : "Login"}
+            Login
           </button>
         </form>
 
-        <div className="text-center mt-4">
-          <a href="#" className="text-sm text-blue-400 hover:underline">
-            Forgot Password?
-          </a>
-        </div>
-
-        <div className="text-center mt-2 text-gray-400">
+        <p className="text-center text-gray-600 mt-4">
           Don't have an account?{" "}
-          <a href="#" className="text-blue-400 hover:underline">
+          <a href="#" className="text-blue-600 font-medium hover:underline">
             Sign up
           </a>
-        </div>
+        </p>
       </div>
     </div>
   );
-};
+}
 
-export default Login;

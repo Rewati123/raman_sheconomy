@@ -11,17 +11,17 @@ import "@/styles/globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null); // Default `null`
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); 
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    setIsAuthenticated(!!token);
   }, []);
+
+  if (isAuthenticated === null) {
+    return null; // Jab tak check ho raha hai tab blank screen rahe
+  }
 
   return (
     <html lang="en">

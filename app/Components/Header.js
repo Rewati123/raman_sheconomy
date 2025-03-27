@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/Components/ui/input";
-import { Button } from "@/Components/ui/button";
-import { FaUserCircle } from "react-icons/fa"; 
+import { FaUserCircle } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -15,29 +16,39 @@ const Header = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Already logged out!");
+      toast.info("Already logged out!");
       router.push("/login");
       return;
     }
 
-    const response = await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await response.json();
-    alert(data.message);
-
-    
-    localStorage.removeItem("token");
-    router.push("/login");
+      const data = await response.json();
+      if (response.ok) {
+        toast.success(data.message || "Logged out successfully!");
+        localStorage.removeItem("token");
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      } else {
+        toast.error(data.message || "Logout failed!");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
+    }
   };
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white border-b relative">
+      <ToastContainer position="top-right" autoClose={2000} />
+      
       <div className="flex items-center">
         <Input type="text" placeholder="Search..." className="w-64 mr-4" />
         <Search className="text-gray-500 cursor-pointer" />
@@ -57,7 +68,6 @@ const Header = () => {
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
               <ul className="py-2">
-              
                 <li>
                   <button
                     onClick={handleLogout}
