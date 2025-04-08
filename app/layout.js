@@ -5,28 +5,35 @@ import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 import Sidebar from "./Components/Sidebar";
 import Header from "./Components/Header";
-import Login from "./Components/Login";
 import "@/styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // Default `null`
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const checkAuth = () => {
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
     setIsAuthenticated(!!token);
-  }, []);
+    if (!token) {
+      router.push('/');
+    }
+  };
 
-  if (isAuthenticated === null) {
-    return null; // Jab tak check ho raha hai tab blank screen rahe
-  }
+  useEffect(() => {
+    checkAuth();
+    // Add event listener for cookie changes
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {isAuthenticated ? (
+        {!isAuthenticated ? (
+          children // Show the login page (which is the root page)
+        ) : (
           <div className="flex h-screen bg-gray-100">
             <Sidebar />
             <div className="flex flex-col flex-1 overflow-hidden">
@@ -36,8 +43,6 @@ export default function RootLayout({ children }) {
               </main>
             </div>
           </div>
-        ) : (
-          <Login />
         )}
       </body>
     </html>

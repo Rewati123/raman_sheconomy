@@ -29,7 +29,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
   const [seoData, setSeoData] = useState({
     metaTitle: "",
     metaDescription: "",
-    og_title: "",
+    ogTitle: "",
     metaKeywords: [],
     ogDescription: "",
     ogImages: [],
@@ -218,7 +218,7 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
       form.append("metaDescription", seoData.metaDescription)
       form.append("metaKeywords", seoData.metaKeywords)
       form.append("ogDescription", seoData.ogDescription)
-      form.append("ogTitle", seoData.og_title);
+      form.append("ogTitle", seoData.ogTitle);
       if (seoData.ogImages && seoData.ogImages.length > 0) {
         seoData.ogImages.forEach((image) => {
           form.append("ogImage", image)
@@ -231,11 +231,11 @@ const ProgramAdd = ({ setdataadd, onSubmitData }) => {
         },
       });
       console.log("Program added successfully", response.data)
-      toast.success(data.message || "Program added  successfully!");
+      toast.success(response.data.message || "Program added successfully!");
       setdataadd(false);
     } catch (error) {
       console.error("Error adding program", error);
-      toast.error(data.message || "Error adding program");
+      toast.error(error.response?.data?.message || "Error adding program");
     } finally {
       setIsSubmitting(false);
     }

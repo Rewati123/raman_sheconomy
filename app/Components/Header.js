@@ -13,33 +13,12 @@ const Header = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      toast.info("Already logged out!");
-      router.push("/login");
-      return;
-    }
-
     try {
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message || "Logged out successfully!");
-        localStorage.removeItem("token");
-        setTimeout(() => {
-          router.push("/login");
-        }, 1500);
-      } else {
-        toast.error(data.message || "Logout failed!");
-      }
+      // Clear the token cookie
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+      toast.success("Logged out successfully!");
+      // Force a hard redirect to ensure clean state
+      window.location.href = '/';
     } catch (error) {
       toast.error("Something went wrong!");
     }

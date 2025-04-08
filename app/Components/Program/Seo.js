@@ -106,15 +106,22 @@ const Seo = ({ onSeoChange }) => {
     })
   }
 
+
+  
+
   const updateSeoData = (newData) => {
     onSeoChange({
       metaTitle,
       metaDescription,
       metaKeywords: keywords.map((k) => k.text),
+      ogTitle, 
+      ogDescription,
       ogImages: images,
       ...newData,
     })
   }
+
+
 
   useEffect(() => {
     if (inputRef.current) {
@@ -256,7 +263,7 @@ const Seo = ({ onSeoChange }) => {
             <Input
               id="og-title"
               placeholder="Enter OG Title"
-              value={ogTitle}
+               value={ogTitle}
               onChange={(e) => {
                 setOgTitle(e.target.value)
                 updateSeoData({ ogTitle: e.target.value })

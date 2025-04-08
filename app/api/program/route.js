@@ -2,18 +2,7 @@ import { NextResponse } from 'next/server';
 import { queryPromise } from '@/lib/db';
 import { put } from '@vercel/blob';
 
-// async function saveImage(file) {
-//   if (!file) return null;
 
-//   const fileExtension = file.name.split('.').pop(); 
-//   const fileName = `${Date.now()}.${fileExtension}`;
-
-//   const blob = await put(fileName, file, {
-//     access: 'public', 
-//   });
-
-//   return blob.url; 
-// }
 
 async function saveImage(file) {
   if (!file) {
@@ -41,152 +30,253 @@ async function saveImage(file) {
 }
 
 
+// export async function PUT(request) {
+//   try {
+//     const formData = await request.formData();
+//     const programId = formData.get("id") || formData.get("programId");
 
-export async function PUT(request) {
-  try {
-    const formData = await request.formData();
-    const programId = formData.get("id") || formData.get("programId");
+//     if (!programId) {
+//       return NextResponse.json({ message: "Program ID missing" }, { status: 400 });
+//     }
 
-    // if (!programId) {
-    //   return NextResponse.json({ error: "Program ID is required" }, { status: 400 });
-    // }
+//     // 🎯 Program Fields
+//     const title = formData.get("title");
+//     const subtitle = formData.get("subtitle");
+//     const shortDescription = formData.get("shortDescription");
+//     const description = formData.get("description");
+//     const idealForDescription = formData.get("idealForDescription");
+//     const timelineDescription = formData.get("timelineDescription");
+//     const startDate = formData.get("startDate");
+//     const endDate = formData.get("endDate");
 
-    const title = formData.get("title");
-    const subtitle = formData.get("subtitle");
-    const shortDescription = formData.get("shortDescription");
-    const description = formData.get("description");
-    const idealForDescription = formData.get("idealForDescription");
-    const timelineDescription = formData.get("timelineDescription");
-    const startDate = formData.get("startDate");
-    const endDate = formData.get("endDate");
+//     // 🎯 SEO Fields
+//     const metaTitle = formData.get("metaTitle");
+//     const metaDescription = formData.get("metaDescription");
+//     const metaKeywordsString = formData.get("metaKeywords");
+//     const ogTitle = formData.get("ogTitle");
+//     const ogDescription = formData.get("ogDescription");
 
-    // SEO Fields
-    const metaTitle = formData.get("metaTitle");
-    const metaDescription = formData.get("metaDescription");
-    const metaKeywords = formData.get("metaKeywords");
-    const ogTitle = formData.get("ogTitle");
+//     // 📷 Save Images
+//     const ogImage = formData.get("ogImage");
+//     const ogImagePath = ogImage ? await saveImage(ogImage) : null;
 
-    // Save ogImage to Blob Storage (if exists)
-    const ogImage = formData.get("ogImage");
-    const ogImagePath = ogImage ? await saveImage(ogImage) : null;
-
-    // Program Image (if exists)
-    const image = formData.get("image");
-    const imagePath = image ? await saveImage(image) : null;
-
-    // Update Program Data Query
-    const updateProgramQuery = `
-    UPDATE program SET 
-        title = ?, 
-        subtitle = ?, 
-        short_description = ?, 
-        description = ?, 
-        ideal_For_Description = ?, 
-        timeline_Description = ?, 
-        start_Date = ?, 
-        end_Date = ?
-        ${imagePath ? ", image = ?" : ""}  
-    WHERE id = ?;
-  `;
-
-    const programParams = [
-      title, subtitle, shortDescription, description,
-      idealForDescription, timelineDescription, startDate, endDate
-    ];
-
-    if (imagePath) programParams.push(imagePath);
-    programParams.push(programId);
-
-    await queryPromise(updateProgramQuery, programParams);
-
-   // Update SEO Data Query
-   const updateSEOQuery = `
-   UPDATE seo SET 
-     meta_title = ?, 
-     meta_description = ?, 
-     meta_keywords = ?, 
-     og_title = ?
-     ${ogImagePath ? ", og_images = ?" : ""}
-   WHERE programId  = ?;
- `;
+//     const image = formData.get("image");
+//     const imagePath = image ? await saveImage(image) : null;
  
- const seoParams = [
-   metaTitle, 
-   metaDescription, 
-   JSON.stringify(metaKeywords.split(',')), 
-   ogTitle
- ];
- 
- if (ogImagePath) seoParams.push(ogImagePath);
- seoParams.push(parseInt(programId, 10)); 
- 
- // Debugging Query Execution
- console.log("SEO Data Received:", {
-  metaTitle, metaDescription, metaKeywords, ogTitle
-});
- 
- const result = await queryPromise(updateSEOQuery, seoParams);
- console.log("SEO Update Result:", result);
- 
-// Check if update was successful
+    
+//     // 🔄 **Update Program Query**
+//     const updateProgramQuery = `
+//       UPDATE program SET 
+//         title = ?, subtitle = ?, short_description = ?, description = ?, 
+//         ideal_For_Description = ?, timeline_Description = ?, start_Date = ?, end_Date = ?
+//         ${imagePath ? ", image = ?" : ""}
+//       WHERE id = ?;
+//     `;
+
+//     const programParams = [title, subtitle, shortDescription, description, idealForDescription, timelineDescription, startDate, endDate];
+//     if (imagePath) programParams.push(imagePath);
+//     programParams.push(programId);
+
+//     await queryPromise(updateProgramQuery, programParams);
+
+//     // 🔄 **Update SEO Query**
+//     const updateSEOQuery = `
+//       UPDATE seo SET 
+//         meta_title = ?, meta_description = ?, meta_keywords = ?, 
+//         og_title = ?, og_description = ?
+//         ${ogImagePath ? ", og_images = ?" : ""}
+//       WHERE programId = ?;
+//     `;
+
+//     const seoParams = [metaTitle, metaDescription, metaKeywordsString, ogTitle, ogDescription];
+//     if (ogImagePath) seoParams.push(ogImagePath);
+//     seoParams.push(parseInt(programId, 10));
+
+//     await queryPromise(updateSEOQuery, seoParams);
+
+//     // 🔄 **Update Benefits**
+    
+//     for (let i = 0; formData.has(`benefits[${i}][title]`); i++) {
+//       const id = formData.get(`benefits[${i}][id]`);
+//       const title = formData.get(`benefits[${i}][title]`);
+//       const description = formData.get(`benefits[${i}][description]`);
+//       const icon = formData.get(`benefits[${i}][icon]`);
+//       const iconPath = icon && !icon.startsWith("http") ? await saveImage(icon) : icon; 
+    
+//       if (!id || id.trim() === "") {
+//         const insertBenefitQuery = `INSERT INTO benefit (title, description, icon) VALUES (?, ?, ?);`;
+//         await queryPromise(insertBenefitQuery, [title, description, iconPath]);
+//       } else {
+//         const updateBenefitQuery = `
+//           UPDATE benefit SET 
+//             title = ?, description = ?
+//             ${iconPath ? ", icon = ?" : ""}
+//           WHERE id = ?;
+//         `;
+    
+//         const benefitParams = [title, description];
+//         if (iconPath) benefitParams.push(iconPath);
+//         benefitParams.push(id);
+    
+//         await queryPromise(updateBenefitQuery, benefitParams);
+//       }
+//     }
+    
+
+//     // 🔄 **Update Testimonials**
+//     for (let i = 0; formData.has(`testimonials[${i}][id]`); i++) {
+//       const id = formData.get(`testimonials[${i}][id]`);
+//       if (!id || id.trim() === "") continue; // ❌ Skip if ID missing
+
+//       const name = formData.get(`testimonials[${i}][name]`);
+//       const designation = formData.get(`testimonials[${i}][designation]`);
+//       const message = formData.get(`testimonials[${i}][message]`);
+//       const profile = formData.get(`testimonials[${i}][profile]`);
+//       const profilePath = profile ? await saveImage(profile) : null;
+
+//       const updateTestimonialQuery = `
+//         UPDATE testimonial SET 
+//           name = ?, designation = ?, message = ?
+//           ${profilePath ? ", profile = ?" : ""}
+//         WHERE id = ?;
+//       `;
+
+//       const testimonialParams = [name, designation, message];
+//       if (profilePath) testimonialParams.push(profilePath);
+//       testimonialParams.push(id);
+
+//       await queryPromise(updateTestimonialQuery, testimonialParams);
+//     }
+
+//     return NextResponse.json({ message: "✅ Program updated successfully" });
+
+//   } catch (error) {
+//     console.error("❌ Error updating program data:", error);
+//     return NextResponse.json({ message: "Error updating program data" }, { status: 500 });
+//   }
+// }
 
 
 
-    // **Handle Benefits (Only Update, No Insert)**
-    for (let i = 0; formData.has(`benefits[${i}][id]`); i++) {
-      const id = formData.get(`benefits[${i}][id]`);
-      const title = formData.get(`benefits[${i}][title]`);
-      const description = formData.get(`benefits[${i}][description]`);
-      const icon = formData.get(`benefits[${i}][icon]`);
-      const iconPath = icon ? await saveImage(icon) : null;
 
-      const updateBenefitQuery = `
-        UPDATE benefit SET 
-          title = ?, 
-          description = ?
-          ${iconPath ? ", icon = ?" : ""}
-        WHERE id = ?;
-      `;
 
-      const benefitParams = [title, description];
-      if (iconPath) benefitParams.push(iconPath);
-      benefitParams.push(id);
+// export async function PUT(request) {
+//   try {
+//     const formData = await request.formData();
+//     const programId = formData.get("programId");
 
-      await queryPromise(updateBenefitQuery, benefitParams);
-    }
+//     if (!programId) {
+//       return NextResponse.json({ message: "Program ID is required" }, { status: 400 });
+//     }
 
-    // **Handle Testimonials (Only Update, No Insert)**
-    for (let i = 0; formData.has(`testimonials[${i}][id]`); i++) {
-      const id = formData.get(`testimonials[${i}][id]`);
-      const name = formData.get(`testimonials[${i}][name]`);
-      const designation = formData.get(`testimonials[${i}][designation]`);
-      const message = formData.get(`testimonials[${i}][message]`);
-      const profile = formData.get(`testimonials[${i}][profile]`);
-      const profilePath = profile ? await saveImage(profile) : null;
+//     // **Program Fields**
+//     const title = formData.get("title");
+//     const subtitle = formData.get("subtitle");
+//     const shortDescription = formData.get("shortDescription");
+//     const description = formData.get("description");
+//     const idealForDescription = formData.get("idealForDescription");
+//     const timelineDescription = formData.get("timelineDescription");
+//     const startDate = formData.get("startDate");
+//     const endDate = formData.get("endDate");
+//     const image = formData.get("image");
 
-      const updateTestimonialQuery = `
-        UPDATE testimonial SET 
-          name = ?, 
-          designation = ?, 
-          message = ?
-          ${profilePath ? ", profile = ?" : ""}
-        WHERE id = ?;
-      `;
+//     // **SEO Fields**
+//     const metaTitle = formData.get("metaTitle");
+//     const metaDescription = formData.get("metaDescription");
+//     const metaKeywords = formData.get("metaKeywords");
+//     const ogTitle = formData.get("ogTitle");
+//     const ogDescription = formData.get("ogDescription");
+//     const ogImages = formData.get("ogImages");
 
-      const testimonialParams = [name, designation, message];
-      if (profilePath) testimonialParams.push(profilePath);
-      testimonialParams.push(id);
+//     // **Benefits**
+//     let benefits = [];
+//     for (let i = 0; formData.has(`benefits[${i}][id]`); i++) {
+//       benefits.push({
+//         id: Number(formData.get(`benefits[${i}][id]`)),
+//         title: formData.get(`benefits[${i}][title]`),
+//         description: formData.get(`benefits[${i}][description]`),
+//         icon: formData.get(`benefits[${i}][icon]`),
+//       });
+//     }
 
-      await queryPromise(updateTestimonialQuery, testimonialParams);
-    }
+//     // **Testimonials**
+//     let testimonials = [];
+//     for (let i = 0; formData.has(`testimonials[${i}][id]`); i++) {
+//       testimonials.push({
+//         id: Number(formData.get(`testimonials[${i}][id]`)),
+//         name: formData.get(`testimonials[${i}][name]`),
+//         designation: formData.get(`testimonials[${i}][designation]`),
+//         message: formData.get(`testimonials[${i}][message]`),
+//         profile: formData.get(`testimonials[${i}][profile]`),
+//       });
+//     }
 
-    return NextResponse.json({ message: "Program updated successfully" });
+//     // **1. Update Program**
+//     await queryPromise(
+//       `UPDATE program SET 
+//         title = ?, 
+//         subtitle = ?, 
+//         short_description = ?, 
+//         description = ?, 
+//         ideal_For_Description = ?, 
+//         timeline_Description = ?, 
+//         start_Date = ?, 
+//         end_Date = ?, 
+//         image = ? 
+//       WHERE id = ?`,
+//       [
+//         title,
+//         subtitle,
+//         shortDescription,
+//         description,
+//         idealForDescription,
+//         timelineDescription,
+//         new Date(startDate),
+//         new Date(endDate),
+//         image,
+//         programId,
+//       ]
+//     );
 
-  } catch (error) {
-    console.error("Error updating program data:", error);
-    return NextResponse.json({ message: "Error updating program data" }, { status: 500 });
-  }
-}
+//     // **2. Update SEO**
+//     await queryPromise(
+//       `UPDATE seo SET 
+//         meta_title = ?, 
+//         meta_description = ?, 
+//         meta_keywords = ?, 
+//         og_images = ?, 
+//         og_title = ?, 
+//         og_description = ? 
+//       WHERE programId = ?`,
+//       [metaTitle, metaDescription, metaKeywords, ogImages, ogTitle, ogDescription, programId]
+//     );
+
+//     // **3. Update Benefits**
+//     for (const benefit of benefits) {
+//       await queryPromise(
+//         `UPDATE benefit SET title = ?, description = ?, icon = ? WHERE id = ?`,
+//         [benefit.title, benefit.description, benefit.icon, benefit.id]
+//       );
+//     }
+
+//     // **4. Update Testimonials**
+//     for (const testimonial of testimonials) {
+//       await queryPromise(
+//         `UPDATE testimonial SET name = ?, designation = ?, message = ?, profile = ? WHERE id = ?`,
+//         [testimonial.name, testimonial.designation, testimonial.message, testimonial.profile, testimonial.id]
+//       );
+//     }
+
+//     return NextResponse.json({ message: "Program updated successfully" });
+//   } catch (error) {
+//     console.error("Error updating program:", error);
+//     return NextResponse.json({ message: "Error updating program" }, { status: 500 });
+//   }
+// }
+
+
+
+
 
 
 
@@ -211,7 +301,8 @@ export async function POST(request) {
     const metaKeywords = formData.get("metaKeywords");
     const ogDescription = formData.get("ogDescription");
     const ogTitle = formData.get("ogTitle");
-
+   
+   
     // **Save ogImage to Blob Storage**
     const ogImage = formData.get("ogImage"); 
     const ogImagePath = ogImage ? await saveImage(ogImage) : null;  
@@ -271,14 +362,16 @@ export async function POST(request) {
       ]);
     }
 
-    // **Insert SEO Data**
-    const seoInsertQuery = `
-      INSERT INTO seo (programId, meta_title, meta_description, meta_keywords, og_images, og_title,og_description)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    await queryPromise(seoInsertQuery, [
-      programId, metaTitle, metaDescription, metaKeywords, ogImagePath, ogTitle,ogDescription 
-    ]);
+
+  // **Insert SEO Data**
+const seoInsertQuery = `
+INSERT INTO seo (programId, meta_title, meta_description, meta_keywords, og_images, og_title, og_description)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+`;
+await queryPromise(seoInsertQuery, [
+programId, metaTitle, metaDescription, metaKeywords, ogImagePath, ogTitle, ogDescription 
+]);
+
 
     return NextResponse.json({ message: "Program added successfully" });
   } catch (error) {
@@ -323,7 +416,8 @@ export async function GET(request) {
         s.meta_keywords,
         s.og_images,
         s.og_title,
-        s.og_description
+        s.og_description,
+        s.id as seoid
 
       FROM program p
       LEFT JOIN benefit b ON p.id = b.programId
@@ -359,7 +453,8 @@ export async function GET(request) {
             metaKeywords: program.meta_keywords,
             ogImages: program.og_images,
             ogTitle: program.og_title,
-            ogDescription: program.og_description,  // ✅ `og_description` ऐड किया
+            ogDescription: program.og_description,
+            seoid:program.seoid
           },
         };
         acc.push(programData);

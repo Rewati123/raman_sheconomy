@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import { useState } from "react";
@@ -29,11 +26,10 @@ export default function Login() {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem("token", data.token);
+        // Set token in cookies with secure and httpOnly flags
+        document.cookie = `token=${data.token}; path=/; max-age=86400; secure; samesite=strict`;
         toast.success("Login Successful! ");
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
+        router.push("/dashboard");
       } else {
         toast.error(data.message || "Login Failed!");
       }

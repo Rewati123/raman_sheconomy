@@ -93,7 +93,11 @@ const ProgramList = () => {
   // Edit Data
   const handleEdit = (data) => {
     setEditData(data);
+    console.log(data.seo,"bbbbbbbbbbb")
+
   };
+
+
 
   const handleUpdate = (data) => {
     console.log("Update function called with data:", data);
@@ -104,7 +108,7 @@ const ProgramList = () => {
     setSearchQuery(event.target.value);
   };
 
-  console.log(userData, "userData");
+  // console.log(editData.seo, "userDataGodseo");
 
   // Filtering based on the search query
   const filteredData = userData.filter((user) =>
@@ -148,6 +152,7 @@ return dataAdd ? (
     data="Edit Data"
     setdataadd={setEditData}
     eduData={editData}
+   
     onSubmit={handleUpdate}
   />
 ) : (
