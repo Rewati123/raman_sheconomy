@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -7,71 +7,77 @@ import { Textarea } from "@/Components/ui/textarea";
 import { toast } from "react-toastify";
 
 const SeoEdit = ({ seoData, setSeoData }) => {
-  const [metaTitle, setMetaTitle] = useState(seoData?.metaTitle || "");
-  const [seoid, setSetid]= useState(seoData.seoid||"")
-  const [metaDescription, setMetaDescription] = useState(seoData?.metaDescription || "");
-  const [metaKeywords, setMetaKeywords] = useState(Array.isArray(seoData?.metaKeywords) ? seoData.metaKeywords : []);
-  const [ogTitle, setOgTitle] = useState(seoData?.ogTitle || "");
-  const [ogDescription, setOgDescription] = useState(seoData?.ogDescription || "");
-  const [ogImages, setOgImages] = useState(Array.isArray(seoData?.ogImages) ? seoData.ogImages : []);
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState([]);
   const [newKeyword, setNewKeyword] = useState("");
+
+  const [ogTitle, setOgTitle] = useState("");
+  const [ogDescription, setOgDescription] = useState("");
+  const [ogImages, setOgImages] = useState([]);
+  const [ogImageFiles, setOgImageFiles] = useState([]);
+
+  useEffect(() => {
+    setMetaTitle(seoData?.metaTitle || "");
+    setMetaDescription(seoData?.metaDescription || "");
+    setOgTitle(seoData?.ogTitle || "");
+    setOgDescription(seoData?.ogDescription || "");
+
+    if (seoData?.metaKeywords) {
+      const keywords = seoData.metaKeywords.split(",").map((k) => k.trim());
+      setMetaKeywords(keywords);
+    } else {
+      setMetaKeywords([]);
+    }
+
+    if (seoData?.ogImages) {
+      if (Array.isArray(seoData.ogImages)) {
+        setOgImages(seoData.ogImages);
+        setOgImageFiles(seoData.ogImages.map(() => null));
+      } else {
+        setOgImages([seoData.ogImages]);
+        setOgImageFiles([null]);
+      }
+    } else {
+      setOgImages([]);
+      setOgImageFiles([]);
+    }
+  }, [seoData]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      const updatedImages = [...ogImages, imageUrl];
-      setOgImages(updatedImages);
-      setSeoData((prev) => ({ ...prev, ogImages: updatedImages }));
+      setOgImages([imageUrl]);        // Replace existing preview
+      setOgImageFiles([file]);        // Replace existing file
     }
   };
+  
 
-  const handleReplaceImage = (index, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      const updatedImages = [...ogImages];
-      updatedImages[index] = imageUrl;
-      setOgImages(updatedImages);
-      setSeoData((prev) => ({ ...prev, ogImages: updatedImages }));
-    }
-  };
-
-  const handleRemoveImage = (index) => {
-    const updatedImages = ogImages.filter((_, i) => i !== index);
-    setOgImages(updatedImages);
-    setSeoData((prev) => ({ ...prev, ogImages: updatedImages }));
-  };
-
-  // **SEO Update Function**
   const handleSeoUpdate = async () => {
-    // alert(`seoid: ${seoData.seoidanil}, ID: ${seoData.id}`);
-
     try {
-    
       const formDataToSend = new FormData();
       formDataToSend.append("action", "update");
       formDataToSend.append("metaTitle", metaTitle);
       formDataToSend.append("metaDescription", metaDescription);
       formDataToSend.append("ogTitle", ogTitle);
       formDataToSend.append("ogDescription", ogDescription);
-  
       formDataToSend.append("metaKeywords", metaKeywords.join(","));
-  
-      ogImages.forEach((image, index) => {
-        formDataToSend.append(`ogImages[${index}]`, image);
-      });
-  
 
-    const apiUrl = `/api/program/${seoData?.id}`;
-  
+      ogImageFiles.forEach((file, index) => {
+        if (file instanceof File) {
+          formDataToSend.append("ogImages", file); // backend must support array of files
+        } else {
+          formDataToSend.append("existingImages[]", ogImages[index]); // keep existing images
+        }
+      });
+
+      const apiUrl = `/api/program/${seoData?.id}`;
       const response = await axios.put(apiUrl, formDataToSend);
-      console.log("🔄 Response Status:", response.status);
-      console.log("📦 Response Data:", response.data);
+
       if (response.status === 200) {
         toast.success("SEO Updated Successfully!");
         setSeoData(response.data);
-      
       } else {
         toast.error("Failed to update SEO.");
       }
@@ -79,22 +85,11 @@ const SeoEdit = ({ seoData, setSeoData }) => {
       console.error("Error updating SEO:", error);
       toast.error("Something went wrong!");
     }
-   
   };
 
-  
-
-
-
-
-
-  
-//   console.log(seoid,"gggggg")
-// console.log(seoData.seoid,"seoData2222222")
   return (
     <div className="p-4 border rounded-lg space-y-4">
       <Label>Meta Title</Label>
-      {/* <input type="hidden" name="seoid" value={seoid} /> */}
       <Input value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder="Enter Meta Title" />
 
       <Label>Meta Description</Label>
@@ -106,32 +101,63 @@ const SeoEdit = ({ seoData, setSeoData }) => {
       <Label>Og Description</Label>
       <Textarea value={ogDescription} onChange={(e) => setOgDescription(e.target.value)} placeholder="Enter Open Graph Description" />
 
-      {/* Image Upload */}
+      <Label>Meta Keywords</Label>
+      <div className="flex flex-wrap gap-2 mb-2">
+        {metaKeywords.map((keyword, index) => (
+          <div key={index} className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1">
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => {
+                const updated = [...metaKeywords];
+                updated[index] = e.target.value;
+                setMetaKeywords(updated);
+              }}
+              className="bg-transparent border-none outline-none w-auto text-sm"
+            />
+            <button
+              onClick={() => {
+                const updated = metaKeywords.filter((_, i) => i !== index);
+                setMetaKeywords(updated);
+              }}
+              className="text-red-600 font-bold"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Input value={newKeyword} onChange={(e) => setNewKeyword(e.target.value)} placeholder="Add new keyword" />
+        <Button
+          onClick={() => {
+            if (newKeyword.trim()) {
+              const updated = [...metaKeywords, newKeyword.trim()];
+              setMetaKeywords(updated);
+              setNewKeyword("");
+            }
+          }}
+        >
+          Add
+        </Button>
+      </div>
+
       <Label>Upload SEO Image</Label>
-      <Input type="file" onChange={handleImageUpload} />
-      
-      <div className="flex gap-2 mt-2">
+      <Input type="file" onChange={handleImageUpload}  />
+
+      {/* Image Preview Section (No upload or delete buttons, only previews) */}
+      <div className="flex gap-2 mt-2 flex-wrap">
         {ogImages.map((img, index) => (
           <div key={index} className="relative border p-2 rounded-lg">
-            <img src={img} alt="SEO Preview" className="w-24 h-24 object-cover rounded-md" />
-            <div className="mt-2 flex gap-2">
-              {/* Replace Image */}
-              <Input type="file" onChange={(e) => handleReplaceImage(index, e)} className="text-xs" />
-              {/* Remove Image */}
-              <button onClick={() => handleRemoveImage(index)} className="text-red-500 text-sm font-bold">
-                Remove
-              </button>
-            </div>
+            <img src={img} alt={`og-${index}`} className="w-24 h-24 object-cover rounded-md" />
           </div>
         ))}
       </div>
 
-   
       <div className="flex gap-4 mt-4">
         <Button onClick={handleSeoUpdate} className="bg-blue-500 text-white">
           Update SEO
         </Button>
-      
       </div>
     </div>
   );

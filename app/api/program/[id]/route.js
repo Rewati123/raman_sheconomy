@@ -11,36 +11,7 @@ async function saveImage(file) {
 }
 
 
-// export async function POST(request) {
 
-
-//   try {
-//     const formData = await request.formData();
-//     console.log("📌 Received formData:", Object.fromEntries(formData.entries()));
-
-//     const programId = formData.get("programId");
-//     const title = formData.get("title");
-//     const description = formData.get("description");
-//     const iconFile = formData.get("icon");
-
-//     if (!programId || !title || !description) {
-//       console.error("❌ Missing fields:", { programId, title, description });
-//       return NextResponse.json({ message: "❌ Missing required fields" }, { status: 400 });
-//     }
-
-//     const iconUrl = iconFile ? await saveImage(iconFile) : null;
-
-//     await queryPromise(
-//       `INSERT INTO benefit (programId, title, description, icon) VALUES (?, ?, ?, ?)`,
-//       [programId, title, description, iconUrl]
-//     );
-
-//     return NextResponse.json({ message: "✅ Benefit added successfully" }, { status: 201 });
-//   } catch (error) {
-//     console.error("❌ Error:", error);
-//     return NextResponse.json({ message: "❌ Error adding benefit", error: error.message }, { status: 500 });
-//   }
-// }
 
 
 
@@ -205,65 +176,98 @@ export async function PUT(request) {
 
  
   
-if (programId) {  
-  const existingSeo = await queryPromise(`SELECT * FROM seo WHERE programId = ?`, [programId]);
+    if (programId) {  
+      const existingSeo = await queryPromise(`SELECT * FROM seo WHERE programId = ?`, [programId]);
+    
+      const metaTitle = formData.get("metaTitle") || existingSeo[0]?.meta_title;
+      const metaDescription = formData.get("metaDescription") || existingSeo[0]?.meta_description;
+      const metaKeywords = formData.get("metaKeywords") || existingSeo[0]?.meta_keywords;
+      const ogImages = formData.getAll("ogImages"); // uploaded file (expecting only one image)
+    
+      let ogImageUrl = existingSeo[0]?.og_images; // default: old image
+    
+      if (ogImages && ogImages.length > 0 && ogImages[0]?.name) {
+        const uploadedUrl = await saveImage(ogImages[0]);
+        if (uploadedUrl) {
+          ogImageUrl = uploadedUrl;
+        }
+      }
+    
+      const ogTitle = formData.get("ogTitle") || existingSeo[0]?.og_title;
+      const ogDescription = formData.get("ogDescription") || existingSeo[0]?.og_description;
+    
+      if (action === "update") {
+        await queryPromise(
+          `UPDATE seo SET 
+            meta_title = COALESCE(?, meta_title), 
+            meta_description = COALESCE(?, meta_description), 
+            meta_keywords = COALESCE(?, meta_keywords), 
+            og_images = COALESCE(?, og_images), 
+            og_title = COALESCE(?, og_title), 
+            og_description = COALESCE(?, og_description) 
+          WHERE programId = ?`, 
+          [metaTitle, metaDescription, metaKeywords, ogImageUrl, ogTitle, ogDescription, programId]
+        );
+      } 
+      else if (action === "delete" && id) {
+        await queryPromise(`DELETE FROM seo WHERE id = ?`, [id]);
+      }
+    }
+    
 
-  const metaTitle = formData.get("metaTitle") || existingSeo[0]?.meta_title;
-  const metaDescription = formData.get("metaDescription") || existingSeo[0]?.meta_description;
-  const metaKeywords = formData.get("metaKeywords") || existingSeo[0]?.meta_keywords;
-  const ogImageUrl = formData.get("ogImage") || existingSeo[0]?.og_images;
-  const ogTitle = formData.get("ogTitle") || existingSeo[0]?.og_title;
-  const ogDescription = formData.get("ogDescription") || existingSeo[0]?.og_description;
-
-  if (action === "update") {
-    await queryPromise(
-      `UPDATE seo SET 
-        meta_title = COALESCE(?, meta_title), 
-        meta_description = COALESCE(?, meta_description), 
-        meta_keywords = COALESCE(?, meta_keywords), 
-        og_images = COALESCE(?, og_images), 
-        og_title = COALESCE(?, og_title), 
-        og_description = COALESCE(?, og_description) 
-      WHERE programId = ?`, 
-      [metaTitle, metaDescription, metaKeywords, ogImageUrl, ogTitle, ogDescription, programId]
-    );
-  } 
-  else if (action === "delete" && id) {
-    await queryPromise(`DELETE FROM seo WHERE id = ?`, [id]);
-}
-
-}
 
 
+// if (seoId) {
+//   const existingSeo = await queryPromise(`SELECT * FROM seo WHERE id = ?`, [seoId]);
 
-if (seoId) {
-  const existingSeo = await queryPromise(`SELECT * FROM seo WHERE id = ?`, [seoId]);
+//   const metaTitle = formData.get("metaTitle") || existingSeo[0]?.meta_title;
+//   const metaDescription = formData.get("metaDescription") || existingSeo[0]?.meta_description;
+//   let metaKeywords = formData.get("metaKeywords") || existingSeo[0]?.meta_keywords;
 
-  const metaTitle = formData.get("metaTitle") || existingSeo[0]?.meta_title;
-  const metaDescription = formData.get("metaDescription") || existingSeo[0]?.meta_description;
-  const metaKeywords = formData.get("metaKeywords") || existingSeo[0]?.meta_keywords;
-  const ogImage = formData.get("ogImage");
-  const ogImageUrl = ogImage instanceof File ? await saveImage(ogImage) : (ogImage || existingSeo[0]?.og_images);
-  const ogTitle = formData.get("ogTitle") || existingSeo[0]?.og_title;
-  const ogDescription = formData.get("ogDescription") || existingSeo[0]?.og_description;
+//   // OG Image Files Upload
+//  // OG Image Files Upload
+// const ogImages = formData.getAll("ogImages"); // new uploaded files
+// const existingImages = formData.getAll("existingImages[]") || []; // existing image URLs
 
-  if (action === "update") {
-    await queryPromise(
-      `UPDATE seo SET 
-        meta_title = COALESCE(?, meta_title), 
-        meta_description = COALESCE(?, meta_description), 
-        meta_keywords = COALESCE(?, meta_keywords), 
-        og_images = COALESCE(?, og_images), 
-        og_title = COALESCE(?, og_title), 
-        og_description = COALESCE(?, og_description) 
-      WHERE id = ?`,
-      [metaTitle, metaDescription, metaKeywords, ogImageUrl, ogTitle, ogDescription, seoId]
-    );
-  } 
-  else if (action === "delete") {
-    await queryPromise(`DELETE FROM seo WHERE id = ?`, [seoId]);
-  }
-}
+// let ogImageUrls = [];
+
+// for (const img of ogImages) {
+//   if (img && img.name) {
+//     const url = await saveImage(img);
+//     if (url) {
+//       ogImageUrls.push(url);
+//     }
+//   }
+// }
+
+// // Merge with existing if available
+// if (existingImages.length > 0) {
+//   ogImageUrls = [...ogImageUrls, ...existingImages];
+// }
+
+// const ogImageUrl = ogImageUrls.length > 0 ? ogImageUrls.join(",") : existingSeo[0]?.og_images;
+
+
+//   const ogTitle = formData.get("ogTitle") || existingSeo[0]?.og_title;
+//   const ogDescription = formData.get("ogDescription") || existingSeo[0]?.og_description;
+
+//   if (action === "update") {
+//     await queryPromise(
+//       `UPDATE seo SET 
+//         meta_title = ?, 
+//         meta_description = ?, 
+//         meta_keywords = ?, 
+//         og_images = ?, 
+//         og_title = ?, 
+//         og_description = ?
+//       WHERE id = ?`,
+//       [metaTitle, metaDescription, metaKeywords, ogImageUrl, ogTitle, ogDescription, seoId]
+//     );
+//   } 
+//   else if (action === "delete") {
+//     await queryPromise(`DELETE FROM seo WHERE id = ?`, [seoId]);
+//   }
+// }
 
 
 
